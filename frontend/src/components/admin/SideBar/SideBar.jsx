@@ -108,6 +108,48 @@ const SideBar = () => {
                     </li>
                     </ul>
                 </li>
+
+                <li class="nav-item">
+                    <a href="" class="nav-link">
+                    <p>
+                        Colors
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <Link to={'colors'} class="nav-link">
+                        <p>List Colors</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link to={'add-colors'} class="nav-link">
+                        <p>Add Color</p>
+                        </Link>
+                    </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="" class="nav-link">
+                    <p>
+                        Products
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <Link to={'products'} class="nav-link">
+                        <p>List Products</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link to={'add-products'} class="nav-link">
+                        <p>Add Product</p>
+                        </Link>
+                    </li>
+                    </ul>
+                </li>
                 </ul>
             </nav>
             {/* /.sidebar-menu */}
