@@ -35,8 +35,7 @@ class UpdateProductRequest extends FormRequest
             'image' => 'required|max:2048', 
             'gallary.*' => 'nullable', 
 
-            'variants.*.size_id' => 'required|integer|exists:sizes,id',
-            'variants.*.stock' => 'required|integer',
+            
         ];
     }
 }

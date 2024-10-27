@@ -107,33 +107,34 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
         Route::get('/getDetailSize/{id}', [SizeController::class, 'getDetailSize']);
     });
 
-    Route::prefix('colors')->group(function () {
-        Route::get('/', [ColorController::class, 'index']);
-        Route::post('/storeColor', [ColorController::class, 'storeColor']);
-        Route::put('/updateColor/{id}', [ColorController::class, 'updateColor']);
-        Route::delete('/deleteColor/{id}', [ColorController::class, 'deleteColor']);
-        Route::get('/getDetailColor/{id}', [ColorController::class, 'getDetailColor']);
-    });
+   
 
     Route::prefix('products')->group(function () {
 
         Route::get('/', [ProductController::class, 'index']);
+
         Route::post('/storeProduct', [ProductController::class, 'storeProduct']);
+
         Route::get('/getDetailProduct/{id}', [ProductController::class, 'getDetailProduct']);
+        
         Route::put('/updateProduct/{id}', [ProductController::class, 'updateProduct']);
         Route::delete('/deleteProduct/{id}', [ProductController::class, 'deleteProduct']);
+
         Route::get('/getProductVariants/{idProduct}', [ProductController::class, 'getProductVariants']);
         // thêm 1 biến thể
         Route::post('/storeProductVariant',[ProductController::class,'storeProductVariant']);
     });
 
-    // Route::prefix('variants')->group(function () {
-    //     Route::get('/', [ProductVariantController::class, 'index']); // Lấy danh sách biến thể
-    //     Route::post('/storeVariant', [ProductVariantController::class, 'storeVariant']); // Thêm biến thể
-    //     Route::put('/updateVariant/{idVariant}', [ProductVariantController::class, 'updateVariant']); // cập nhập biến thể
-    //     Route::delete('/deleteVariant/{idVariant}', [ProductVariantController::class, 'deleteVariant']);
-    //     Route::get('/getDetailVariant/{idVariant}', [ProductVariantController::class, 'getDetailVariant']);
-    // });
+    Route::prefix('variants')->group(function () {
+
+        Route::get('/', [ProductVariantController::class, 'index']); // Lấy danh sách biến thể
+        // Route::post('/storeVariant', [ProductVariantController::class, 'storeVariant']); // Thêm biến thể
+        Route::put('/updateVariant/{idVariant}', [ProductVariantController::class, 'updateVariant']); // cập nhập biến thể
+
+        Route::delete('/deleteVariant/{idVariant}', [ProductVariantController::class, 'deleteVariant']);
+
+        Route::get('/getDetailVariant/{idVariant}', [ProductVariantController::class, 'getDetailVariant']);
+    });
 
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewAdminController::class, 'index']); // Lấy danh sách biến thể// Route::put('/updateVariant/{id}', [ReviewsController::class, 'updateVariant']); // cập nhập biến thể

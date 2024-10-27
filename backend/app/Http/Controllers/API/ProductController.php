@@ -224,7 +224,7 @@ class ProductController extends Controller
             Log::info(['products_update'], $request->all());
 
 
-            $product = Product::with('variants')->findOrFail($id);
+            $product = Product::findOrFail($id);
 
             $validatedData = $request->validated();
 
@@ -279,49 +279,6 @@ class ProductController extends Controller
                 'gallary' => json_encode($gallaryPaths),
                 'user_id' => auth()->id(),
             ]);
-
-            // Cập nhật hoặc thêm mới biến thể sản phẩm
-            if (!empty($validatedData['variants'])) {
-                Log::debug('Vào hàm product_variants ');
-
-                foreach ($validatedData['variants'] as $variantData) {
-                    // Kiểm tra xem biến thể với size_id mới có tồn tại không
-                    $existingVariant = ProductVariant::where('product_id', $product->id)
-                        ->where('size_id', $variantData['size_id'])
-                        ->first();
-
-                    if ($existingVariant) {
-                        // Nếu size_id đã tồn tại, cập nhật stock của biến thể đó
-                        $existingVariant->update([
-                            'stock' => $variantData['stock'],
-                        ]);
-                    } else {
-                        // Nếu size_id chưa tồn tại, kiểm tra xem biến thể hiện tại có size_id khác không
-                        $currentVariant = ProductVariant::where('product_id', $product->id)
-                            ->where('size_id', $variantData['size_id'])
-                            ->first();
-
-                        if ($currentVariant) {
-                            // Nếu có biến thể hiện tại, cập nhật nó
-                            $currentVariant->update([
-                                'stock' => $variantData['stock'],
-                                'size_id' => $variantData['size_id'],
-                            ]);
-                        } else {
-                            // Tạo biến thể mới nếu không tìm thấy
-                            ProductVariant::create([
-                                'product_id' => $product->id,
-                                'size_id' => $variantData['size_id'],
-                                'stock' => $variantData['stock'],
-                            ]);
-                        }
-                    }
-                }
-            }
-
-
-            // Tải lại dữ liệu sản phẩm cùng với các biến thể
-            $product->load('variants');
 
             return response()->json([
                 'message' => 'Cập nhật thành công',
