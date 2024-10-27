@@ -26,13 +26,16 @@ class StoreProductRequest extends FormRequest
             'description' => 'required|string',
             'brand_id' => 'required|integer|exists:brands,id',
             'category_id' => 'required|integer|exists:categories,id',
-            'variants.*.size_id' => 'required|integer',
-            'variants.*.color_id' => 'required|integer',
-            'variants.*.sku' => 'required|string|max:255',
+            
+            'price' => 'required|numeric|min:0',
+            'sku' => 'required|string|max:100|unique:products,sku',
+            'image' => 'required|max:2048', 
+            'gallary.*' => 'nullable', 
+            
+
+            'variants.*.size_id' => 'required|integer|exists:sizes,id',
             'variants.*.stock' => 'required|integer',
-            'variants.*.price' => 'required|numeric',
-            'variants.*.image' => 'required|image|max:2048', // Bắt buộc hình ảnh chính
-            'variants.*.gallary.*' => 'nullable|image|max:2048', // Ảnh phụ có thể không bắt buộc
+        
         ];
     }
 }

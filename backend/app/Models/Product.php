@@ -13,7 +13,7 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['name','slug','description','price','brand_id','category_id','user_id'];
+    protected $fillable = ['name','slug','description','price','brand_id','category_id','user_id','sku','image','gallary'];
 
     public function getSlugOptions() : SlugOptions
     {

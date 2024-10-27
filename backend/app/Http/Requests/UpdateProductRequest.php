@@ -25,10 +25,18 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('id');  //lấy id từ router
         
         return [
-            'name'=>['required','string','max:255',Rule::unique('products')->ignore($productId)],
-            'description' => 'required|string|max:1000',
+            'name'=>['required','string','min:3','max:255',Rule::unique('products')->ignore($productId)],
+            'description' => 'required|string',
             'brand_id' => 'required|integer|exists:brands,id',
             'category_id' => 'required|integer|exists:categories,id',
+
+            'price' => 'required|numeric|min:0',
+            'sku' =>  ['required','string','max:100',Rule::unique('products')->ignore($productId)],
+            'image' => 'required|max:2048', 
+            'gallary.*' => 'nullable', 
+
+            'variants.*.size_id' => 'required|integer|exists:sizes,id',
+            'variants.*.stock' => 'required|integer',
         ];
     }
 }
