@@ -19,31 +19,28 @@ class HomeController extends Controller
     {
         try {
             // Lấy tất cả sản phẩm cùng với thông tin biến thể chính và hình ảnh
-            $products = Product::with(['brand', 'category', 'mainVariant' => function ($query) {
-                $query->with('images'); // Lấy cả hình ảnh từ biến thể chính
-            }])->limit(12)->get();
-
+            $products = Product::with('brand','category')->limit(12)->get();
             // định dạng lại dữ liệu sẽ được trả về
             // Xử lý từng sản phẩm để trả về thông tin cần thiết
-            $productsWithMainVariant = $products->map(function ($product) {
-                $mainVariant = $product->mainVariant; // Lấy biến thể chính của sản phẩm
-                $primaryImage = $mainVariant ? $mainVariant->images->firstWhere('is_primary', 1) : null; // Lấy hình ảnh chính (is_primary = 1)
-
+            $formatProductHome = $products->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
                     'description' => $product->description,
+                    'sku'=>$product->sku,
+                    'brand_id'=>$product->brand->id,
                     'brand' => $product->brand->name, // Lấy tên thương hiệu
                     'category' => $product->category->name, // Lấy tên danh mục
-                    'price' => $mainVariant ? $mainVariant->price : null, // Giá từ biến thể chính
-                    'image' => $primaryImage ? $primaryImage->image_path : null // Đường dẫn hình ảnh
+                    'category_id'=>$product->category->id,
+                    'price' => $product->price,
+                    'image' => asset($product->image),
                 ];
             });
 
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $productsWithMainVariant,
+                'data' => $formatProductHome,
             ], Response::HTTP_OK);
         } catch (\Throwable $th) {
             // Ghi log lỗi
@@ -100,9 +97,16 @@ class HomeController extends Controller
     {
         try {
             // Lấy sản phẩm duy nhất có slug tương ứng cùng với tất cả các biến thể và hình ảnh
-            $product = Product::with(['brand', 'category', 'variants.images']) // Lấy tất cả các biến thể và hình ảnh
+            $product = Product::with(['brand', 'category', 'variants']) // Lấy tất cả các biến thể và hình ảnh
                 ->where('slug', $slug)
                 ->first(); // Sử dụng first() để lấy một sản phẩm
+
+            $product->image = asset($product->image);
+            $product->gallary = collect(json_decode($product->gallary))
+                ->map(function($image){
+                    return asset($image);
+                })            
+            ;
 
             // Kiểm tra nếu không có sản phẩm nào được tìm thấy
             if (!$product) {
@@ -112,7 +116,7 @@ class HomeController extends Controller
             }
 
             // Lấy các sản phẩm liên quan (cùng danh mục, ngoại trừ sản phẩm hiện tại)
-            $relatedProducts = Product::with('mainVariant.images') // Lấy các biến thể chính và hình ảnh
+            $relatedProducts = Product::with('variants') // Lấy các biến thể chính và hình ảnh
                 ->where('category_id', $product->category_id) // Cùng danh mục
                 ->where('brand_id', $product->brand_id) // Cùng thương hiệu
                 ->where('id', '!=', $product->id) // Ngoại trừ sản phẩm hiện tại
@@ -122,17 +126,15 @@ class HomeController extends Controller
            
             // Định dạng lại dữ liệu sản phẩm liên quan
             $relatedProductsFormatted = $relatedProducts->map(function ($relatedProduct) {
-                $mainVariant = $relatedProduct->mainVariant; // Lấy biến thể chính
-                $primaryImage = $mainVariant ? $mainVariant->images->firstWhere('is_primary', 1) : null; // Lấy hình ảnh chính
-
                 return [
                     'id' => $relatedProduct->id,
                     'name' => $relatedProduct->name,
                     'slug' => $relatedProduct->slug,
                     'brand' => $relatedProduct->brand->name,
                     'category' => $relatedProduct->category->name,
-                    'price' => $mainVariant ? $mainVariant->price : null,
-                    'image' => $primaryImage ? $primaryImage->image_path : null,
+                    'price'=> $relatedProduct->price,
+                    'sku' => $relatedProduct->sku,
+                    'image' => asset($relatedProduct->image),
                 ];
             });
 
