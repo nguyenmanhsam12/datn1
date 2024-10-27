@@ -64,16 +64,10 @@ const AddProduct = () => {
         size_id: variant.size_id,
         stock: variant.stock,
       })),
-
-
-
     };
-
     console.log(formData);
-
     addProduct(formData);
-    
-
+    navigate('/admin/products')
   };
 
   return (
@@ -107,7 +101,7 @@ const AddProduct = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor='price'>Giá Biến Thể</label>
+            <label htmlFor='price'>Giá </label>
             <input
               type="text"
               id='price'

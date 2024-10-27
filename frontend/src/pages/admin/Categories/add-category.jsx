@@ -5,7 +5,7 @@ import { useCategories } from '../../../context/CategoryContext';
 const AddCategory = () => {
     const {addCategory, categories} = useCategories()
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({name:'', parent_id: '' })
+    const [formData, setFormData] = useState({name:'', parent_id: '' || 0 })
 
     const handleChange = (e) =>{
         const {name, value} = e.target;
