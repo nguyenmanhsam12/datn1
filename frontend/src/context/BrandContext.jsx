@@ -28,8 +28,9 @@ export const BrandProvider = ({children}) => {
     }
 
     const addBrand = async (brand) => {
-        const newBrand = await createBrand(brand);
-        setBrands((prev)=>[...prev,newBrand.data])
+        await createBrand(brand);
+        const resdata = await fecthBrand(); 
+        setBrands(resdata.data);
     }
 
     const editBrand = async (id, brand) => {

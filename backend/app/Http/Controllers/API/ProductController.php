@@ -31,7 +31,7 @@ class ProductController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'description' => $product->description,
-                    'sku ' => $product->sku,
+                    'sku' => $product->sku,
                     'price' => $product->price,
                     'image' => asset($product->image),
                     'brand_id' => $product->brand->name,
@@ -86,7 +86,7 @@ class ProductController extends Controller
                 // Di chuyển ảnh và lưu đường dẫn tương đối
                 $validatedData['image']->move(public_path('product_image'), $name_extension);
 
-                $imagePath = 'product_image/' . $name_extension; // Đường dẫn tương đối
+                $imagePath = '/'.'product_image/' . $name_extension;
 
             }
 

@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { createCategory, deleteCategory, fecthCategory, updateCategory } from '../services/categoryService';
+import { useNavigate } from 'react-router-dom';
 
 const CategoryContext = createContext();
 
 export const useCategories = () => useContext(CategoryContext);
 export const CategoryProvider = ({children}) => {
     const [categories, setCategories] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(()=>{
         const loadCategories = async () =>{
@@ -29,8 +31,10 @@ export const CategoryProvider = ({children}) => {
     }
 
     const addCategory = async (category) => {
-        const newCategory = await createCategory(category);
-        setCategories((prev)=>[...prev,newCategory.data]);
+        await createCategory(category);
+        const updateCategories = await fecthCategory(); 
+        setCategories(updateCategories.data);
+        navigate('/admin/categories');
     }
 
     const editCategory = async (id, category) => {

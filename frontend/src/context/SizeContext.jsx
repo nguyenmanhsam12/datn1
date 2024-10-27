@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { createSize, deleteSize, fecthSize, updateSize } from '../services/sizeService';
+import { useNavigate } from 'react-router-dom';
 
 const SizeContext = createContext();
 
 export const useSizes = () => useContext(SizeContext);
 export const SizeProvider = ({children}) => {
     const [sizes, setSizes] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(()=>{
         const loadSizes = async () =>{
@@ -28,14 +30,17 @@ export const SizeProvider = ({children}) => {
     }
 
     const addSize = async (size) => {
-        const newSize = await createSize(size);
-        setSizes((prev)=>[...prev,newSize.data])
+        await createSize(size);
+        const resdata = await fecthSize(); 
+        setSizes(resdata.data);
+        navigate('/admin/sizes');
     }
 
     const editSize = async (id, size) => {
         await updateSize(id, size);
         const updateSizes = await fecthSize(); 
-        setBrands(updateSizes.data);
+        setSizes(updateSizes.data);
+        navigate('/admin/sizes');
     };
   return (
     <SizeContext.Provider value={{sizes,removeSize,addSize, editSize}}>
