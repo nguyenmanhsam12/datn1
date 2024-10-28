@@ -1,8 +1,11 @@
 
 import { Link } from 'react-router-dom';
+import { useVariants } from '../../../context/VariantContext';
 
 const ListVariant = () => {
-
+    const {variants, removeVariant} = useVariants();
+    console.log(variants);
+    
 
     return (
         <div className="content-wrapper">
@@ -43,34 +46,26 @@ const ListVariant = () => {
                             <tr>
                                 <th>STT</th>
                                 <th>Tên sản phẩm</th>
-                                <th>Size</th>
+                                <th>Tên biến thể</th>
                                 <th>Số lượng</th>
                                 <th>Giá</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* {brands.map((brand, i)=>(
-                        <tr key={brand.id}>
-                            <td>{i+1}</td>
-                            <td>{brand.name}</td>
-                            <td>{brand.slug}</td>
-                            <td>
-                                <Link to={`/admin/edit-brands/${brand.id}`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
-                                <button onClick={()=>removeBrand(brand.id)} className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
-                            </td>
-                        </tr>
-                        ))} */}
-
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                            {variants.map((variant,i)=>(
+                            <tr key={variant.id}>
+                                <td>{i+1}</td>
+                                <td>{variant.product_name}</td>
+                                <td>{variant.size}</td>
+                                <td>{variant.stock}</td>
+                                <td>{variant.price}</td>
                                 <td>
-                                    <Link to={`/admin/edit-variants/1`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
-                                    <button className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
+                                    <Link to={`/admin/edit-variants/${variant.id}`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
+                                    <button onClick={()=>removeVariant(variant.id)} className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
                                 </td>
                             </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
