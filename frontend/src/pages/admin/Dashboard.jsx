@@ -22,7 +22,7 @@ const Dashboard = () => {
         </div>
         {/* /.content-header */}
         {/* Main content */}
-        <h1 className='container text-center'>Đây là DASHBOARD, không phận sự thì <br /> <a href="http://localhost:5173/">CÚT!!!!</a></h1>
+        <h1 className='container text-center'>hihihihi</h1>
         {/* /.content */}
       </div>
       {/* /.content-wrapper */}
