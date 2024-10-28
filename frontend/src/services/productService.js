@@ -19,7 +19,7 @@ export const fecthProduct = async() =>{
 export const fetchProductById = async(id)=>{
     const token = sessionStorage.getItem('token');
     if (token) {
-        const { data } = await api.get(`/admin/products//getDetailProduct/${id}`, {
+        const { data } = await api.get(`/admin/products/getDetailProduct/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return data;
@@ -59,6 +59,7 @@ export const updateProduct= async (id, updateProduct) =>{
     if (token) {
         const { data } = await api.put(`/admin/products/updateProduct/${id}`, updateProduct, {
             headers: { Authorization: `Bearer ${token}` },
+            'Content-Type': 'multipart/form-data',
         });
         return data;
     }

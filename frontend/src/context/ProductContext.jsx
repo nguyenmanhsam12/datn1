@@ -46,7 +46,7 @@ export const ProductProvider = ({children}) => {
   const editProduct = async (id, product)=>{
     await updateProduct(id, product);
     const updateProducts = await fecthProduct(); 
-    setCategories(updateProducts.data);
+    setProducts(updateProducts.data);
   }
   return (
     <ProductContext.Provider value={{products,addProduct, removeProduct, addVariant, editProduct}}>
