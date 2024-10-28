@@ -27,7 +27,7 @@ class UpdateVariantRequest extends FormRequest
         return [
             'size_id' => 'required|exists:sizes,id',
             'stock' => 'required|integer|min:1',
-           
+            'price' => 'required|integer|min:10'
         ];
     }
 }

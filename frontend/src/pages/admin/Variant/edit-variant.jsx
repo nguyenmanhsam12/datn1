@@ -1,44 +1,49 @@
 import React, { useState, useEffect } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { fecthBrandById } from '../../../services/brandService';
+import { useVariants } from '../../../context/VariantContext';
+import { fecthVariantById } from '../../../services/variantService';
 import { useSizes } from '../../../context/SizeContext';
 
 const EditVariant = () => {
-
-
-  const { sizes } = useSizes();
-
+  const {sizes} = useSizes();
+  const {editVariant} = useVariants();
+  const {id} = useParams();
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [formData, setFormData] = useState({ size_id: '', stock: '', price: '' });
+  const [formData, setFormData] = useState({product_name:'', size_id:'', stock:'' , price:''})
 
-  useEffect(() => {
-    const loadBrandEdit = async () => {
+  useEffect(()=>{
+    const loadVariantEdit = async()=>{
       try {
-        const brandToEdit = await fecthBrandById(id);
-        // console.log(brandToEdit);
-        if (brandToEdit) {
-          setFormData({ name: brandToEdit.data.name });
+        const VariantToEdit = await fecthVariantById(id);
+        console.log(VariantToEdit);
+        if (VariantToEdit) {
+          setFormData({
+            product_name:VariantToEdit.data.product_name,
+            size_id:VariantToEdit.data.size.id,
+            stock:VariantToEdit.data.stock,
+            price:VariantToEdit.data.price
+          })
         }
+        
       } catch (error) {
-        console.error('Error fetching brand:', error);
+        
       }
-    };
-    loadBrandEdit();
-  }, [id]);
+    }
+    loadVariantEdit();
+  },[id])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    // e.preventDefault();
-    // // console.log(formData);
-
-    // await editBrand(id, formData);
-    // navigate('/admin/brands');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    
+    await editVariant(id, formData);
+    navigate('/admin/variants'); 
   };
 
   return (
@@ -64,7 +69,8 @@ const EditVariant = () => {
             <label htmlFor="VariantName">Tên sản phẩm</label>
             <input
               name='size_id'
-              value=''
+              value={formData.product_name}
+              onChange={handleChange}
               type="text"
               className="form-control"
               id="VariantName"
@@ -75,10 +81,12 @@ const EditVariant = () => {
             <label htmlFor='size_id'>Kích cỡ</label>
             <select
               id='size_id'
+              name='size_id'
               className="form-control"
-              value={sizes.id}
+              onChange={handleChange}
+              value={formData.size_id}
             >
-              <option disabled selected value=''>Select size</option>
+              <option disabled  value=''>Select size</option>
               {sizes.map((size) => (
                 <option key={size.id} value={size.id}>
                   {size.size}
@@ -87,27 +95,25 @@ const EditVariant = () => {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="size_id">Số lượng</label>
+            <label htmlFor="stock">Số lượng</label>
             <input
-              name='size_id'
-              value={formData.name}
+              name='stock'
+              value={formData.stock}
               onChange={handleChange}
               type="text"
               className="form-control"
-              id="size_id"
-              placeholder="Edit size"
+              id="stock"
             />
           </div>
           <div className="form-group">
-            <label htmlFor="size_id">Giá</label>
+            <label htmlFor="price">Giá</label>
             <input
-              name='size_id'
-              value={formData.name}
+              name='price'
               onChange={handleChange}
+              value={formData.price}
               type="text"
               className="form-control"
-              id="size_id"
-              placeholder="Edit size"
+              id="price"
             />
           </div>
         </div>

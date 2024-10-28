@@ -29,7 +29,7 @@ class ProductVariantController extends Controller
                     'id' => $variant->id, // ID của biến thể
                     'product_name' => $variant->product->name, // Tên sản phẩm
                     'size' => $variant->size ? $variant->size->size : null, // Kích thước
-                    'price' => $variant->product->price, // Giá
+                    'price' => $variant->price, // Giá
                     'stock' => $variant->stock, // Số lượng tồn kho
                 ];
             });
@@ -142,6 +142,7 @@ class ProductVariantController extends Controller
             // Cập nhật các trường khác
             $variant->size_id = $request->size_id;
             $variant->stock = $request->stock;
+            $variant->price = $request->price;
             // Lưu biến thể
             $variant->save();
 
@@ -210,6 +211,8 @@ class ProductVariantController extends Controller
                     'id' => $variant->size->id,
                     'size' => $variant->size->size, // Tên kích thước
                 ],
+                'price' => $variant->price,
+                'stock' => $variant->stock,
             ];
 
             return response()->json([
