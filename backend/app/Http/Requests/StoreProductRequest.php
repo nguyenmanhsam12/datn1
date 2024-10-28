@@ -27,7 +27,7 @@ class StoreProductRequest extends FormRequest
             'brand_id' => 'required|integer|exists:brands,id',
             'category_id' => 'required|integer|exists:categories,id',
             
-            'price' => 'required|numeric|min:0',
+            
             'sku' => 'required|string|max:100|unique:products,sku',
             'image' => 'required|max:2048', 
             'gallary.*' => 'nullable', 
@@ -35,7 +35,9 @@ class StoreProductRequest extends FormRequest
 
             'variants.*.size_id' => 'required|integer|exists:sizes,id',
             'variants.*.stock' => 'required|integer',
-        
+            'variants.*.price' => 'required|numeric|min:0',
+
+
         ];
     }
 }
