@@ -1,6 +1,5 @@
 import React from 'react'
 import { useRoutes } from 'react-router-dom'
-import Home from './pages/client/Home'
 import Dashboard from './pages/admin/Dashboard'
 import AdminLayout from './layouts/AdminLayout'
 import ListBrand from './pages/admin/Brand/brand'
@@ -15,11 +14,12 @@ import EditSize from './pages/admin/Size/edit-size'
 import ListProduct from './pages/admin/Product/products'
 import AddProduct from './pages/admin/Product/add-product'
 import EditProduct from './pages/admin/Product/edit-products'
+import ClientLayout from './layouts/ClientLayout'
 
 const Routes = () => {
     const routes = useRoutes([
         //client
-        {path:'',element:<Home/>},
+        {path:'',element:<ClientLayout/>},
         //admin
         {path:'admin', element:<AdminLayout/>,children:[
             {path:'',element:<Dashboard/>},

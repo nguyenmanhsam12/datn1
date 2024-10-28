@@ -16,6 +16,16 @@ export const fecthProduct = async() =>{
     } 
 }
 
+export const fetchProductById = async(id)=>{
+    const token = sessionStorage.getItem('token');
+    if (token) {
+        const { data } = await api.get(`/admin/products//getDetailProduct/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return data;
+    }
+}
+
 export const createProduct= async (product) =>{
     const token = sessionStorage.getItem('token');
     if (token) {
@@ -42,5 +52,14 @@ export const addsingleVariant = async (product_variant) =>{
         await api.post(`/admin/products/storeProductVariant`,product_variant, {
             headers: { Authorization: `Bearer ${token}` },
         });
+    }
+}
+export const updateProduct= async (id, updateProduct) =>{
+    const token = sessionStorage.getItem('token');
+    if (token) {
+        const { data } = await api.put(`/admin/products/updateProduct/${id}`, updateProduct, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return data;
     }
 }
