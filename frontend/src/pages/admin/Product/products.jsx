@@ -9,6 +9,8 @@ const ListProduct = () => {
   const {sizes} = useSizes();
   const [size, setSize] = useState('');
   const [stock, setStock] = useState('');
+  const [price, setPrice] = useState('');
+
   
   // Trạng thái để theo dõi sản phẩm nào đang mở form
   const [openProductId, setOpenProductId] = useState(null);
@@ -24,6 +26,7 @@ const ListProduct = () => {
       product_id: productId,
       size_id: size,
       stock: stock,
+      price : price,
     };
     console.log(formData);
 
@@ -43,7 +46,9 @@ const ListProduct = () => {
           <div className="row mb-2">
             <div className="col-sm-6">
               <h1>Products Tables</h1>
+              <Link to={'/admin/add-products'} className='btn btn-success mt-3'>Thêm sản phẩm</Link>
             </div>
+            
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item"><a href="#">Home</a></li>
@@ -72,12 +77,11 @@ const ListProduct = () => {
           <table className="table table-hover text-nowrap">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Tên</th>
-                <th>Mô tả</th>
+                <th>STT</th>
+                <th>Sản phẩm
+                </th>
+                <th>Hình ảnh</th>
                 <th>Mã</th>
-                <th>Ảnh</th>
-                <th>Giá</th>
                 <th>Thương Hiệu</th>
                 <th>Danh Mục</th>
                 <th>Tác Giả</th>
@@ -90,12 +94,10 @@ const ListProduct = () => {
                   <tr>
                     <td>{i + 1}</td>
                     <td>{product.name}</td>
-                    <td>{product.description}</td>
-                    <td>{product.sku}</td>
                     <td style={{ width: '10%', height: 'auto' }}>
                       <img style={{ width: '50%', height: 'auto', objectFit: 'contain' }} src={`${baseURL}${product.image}`} />
                     </td>
-                    <td>{product.price}</td>
+                    <td>{product.sku}</td>
                     <td>{product.brand_id}</td>
                     <td>{product.category_id}</td>
                     <td>{product.user_id}</td>
@@ -144,6 +146,16 @@ const ListProduct = () => {
                               id={`attribute-value-${product.id}`}
                               onChange={(e) => setStock(e.target.value)}
                               value={stock}
+                              className="form-control"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor={`attribute-value-${product.id}`}>Giá</label>
+                            <input
+                              type="text"
+                              id={`attribute-value-${product.id}`}
+                              onChange={(e) => setPrice(e.target.value)}
+                              value={price}
                               className="form-control"
                             />
                           </div>

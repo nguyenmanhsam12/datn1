@@ -15,7 +15,6 @@ const AddProduct = () => {
   const [brandId, setBrandId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [name, setName] = useState(''); // State cho tên sản phẩm
-  const [price, setPrice] = useState('');
   const [sku, setSku] = useState('');
   const [image, setImage] = useState({});
   const [gallary, setGallary] = useState([]); // State cho gallery
@@ -42,7 +41,7 @@ const AddProduct = () => {
   };
 
   const handleAddVariant = () => {
-    setVariants([...Variants, { size_id: '', stock: 0, }]);
+    setVariants([...Variants, { size_id: '', stock: 0, price : '' }]);
   };
 
   const removeVariant = (index) => {
@@ -56,13 +55,13 @@ const AddProduct = () => {
       description: description,
       brand_id: brandId,
       category_id: categoryId,
-      price: price, // Thêm price vào formData
       sku: sku,
       image: image, // Thêm image vào formData
       gallary: gallary, // Chuyển đổi FileList thành mảng
       variants: Variants.map((variant) => ({
         size_id: variant.size_id,
         stock: variant.stock,
+        price: variant.price,
       })),
     };
     console.log(formData);
@@ -76,6 +75,8 @@ const AddProduct = () => {
         <h1>Product Add Form</h1>
       </section>
       <section className="content">
+
+        
         <form className="card-body">
           <div className="form-group">
             <label htmlFor="name">Tên Sản Phẩm</label>
@@ -100,16 +101,7 @@ const AddProduct = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor='price'>Giá </label>
-            <input
-              type="text"
-              id='price'
-              className="form-control"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
-          </div>
+
 
           <div className="form-group">
             <label htmlFor='sku'>SKU</label>
@@ -187,7 +179,7 @@ const AddProduct = () => {
                 </div>
                 <div className="card-body">
                   <div className="form-group">
-                    <label htmlFor={`variant_size_${index}`}>Kích Thước</label>
+                    <label htmlFor={`variant_size_${index}`}>Kích cỡ</label>
                     <select
                       id={`variant_size_${index}`}
                       className="form-control"
@@ -207,7 +199,7 @@ const AddProduct = () => {
                   <div className="form-group">
                     <label htmlFor={`variant_stock_${index}`}>Số Lượng Tồn Kho</label>
                     <input
-                      type="number"
+                      type="text"
                       id={`variant_stock_${index}`}
                       className="form-control"
                       value={variant.stock}
@@ -215,6 +207,16 @@ const AddProduct = () => {
                     />
                   </div>
 
+                  <div className="form-group">
+                    <label htmlFor='price'>Giá </label>
+                    <input
+                      type="text"
+                      id='price'
+                      className="form-control"
+                      value={variant.price}
+                      onChange={(e) => handleVariantChange(index,'price',e.target.value)}
+                    />
+                  </div>
 
 
                 </div>
