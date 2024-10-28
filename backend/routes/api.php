@@ -61,11 +61,6 @@ Route::get('/getAllProBrand/{brandSlug}', [HomeController::class, 'getAllProBran
 Route::get('/getProductBySlug/{slug}', [HomeController::class, 'getProductBySlug']);
 
 
-
-
-
-
-
 Route::prefix('Wishlist')->group(function () {
     Route::get('/', [WishlistsController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/storeWishlist', [WishlistsController::class, 'storeWishlists'])->middleware('auth:sanctum');

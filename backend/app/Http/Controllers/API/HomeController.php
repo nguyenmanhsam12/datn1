@@ -19,7 +19,7 @@ class HomeController extends Controller
     {
         try {
             // Lấy tất cả sản phẩm cùng với thông tin biến thể chính và hình ảnh
-            $products = Product::with('brand','category')->limit(12)->get();
+            $products = Product::with('brand', 'category')->limit(12)->get();
             // định dạng lại dữ liệu sẽ được trả về
             // Xử lý từng sản phẩm để trả về thông tin cần thiết
             $formatProductHome = $products->map(function ($product) {
@@ -28,11 +28,11 @@ class HomeController extends Controller
                     'name' => $product->name,
                     'slug' => $product->slug,
                     'description' => $product->description,
-                    'sku'=>$product->sku,
-                    'brand_id'=>$product->brand->id,
+                    'sku' => $product->sku,
+                    'brand_id' => $product->brand->id,
                     'brand' => $product->brand->name, // Lấy tên thương hiệu
                     'category' => $product->category->name, // Lấy tên danh mục
-                    'category_id'=>$product->category->id,
+                    'category_id' => $product->category->id,
                     'price' => $product->price,
                     'image' => asset($product->image),
                 ];
@@ -66,7 +66,6 @@ class HomeController extends Controller
     public function AllCategory(Recursive $recursive)
     {
         try {
-
             $list_category = $recursive->getCategoryTree();
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
@@ -97,16 +96,32 @@ class HomeController extends Controller
     {
         try {
             // Lấy sản phẩm duy nhất có slug tương ứng cùng với tất cả các biến thể và hình ảnh
-            $product = Product::with(['brand', 'category', 'variants']) // Lấy tất cả các biến thể và hình ảnh
+            $product = Product::with(['brand', 'category', 'variants.size']) // Lấy tất cả các biến thể và hình ảnh
                 ->where('slug', $slug)
                 ->first(); // Sử dụng first() để lấy một sản phẩm
 
-            $product->image = asset($product->image);
-            $product->gallary = collect(json_decode($product->gallary))
-                ->map(function($image){
-                    return asset($image);
-                })            
-            ;
+            $productFormatted = (object)[
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'price' => $product->price,
+                    'brand' => $product->brand->name,
+                    'category' => $product->category->name,
+                    'image' => asset($product->image),
+                    'gallary' => collect(json_decode($product->gallary))
+                        ->map(function ($image) {
+                            return asset($image);
+                        }),
+                    'variants' => $product->variants->map(function ($variant) {
+                        return [
+                            'id' => $variant->id,
+                            'size' => $variant->size->size,
+                            'stock' => $variant->stock,
+                        ];
+                    })
+                ];
+
 
             // Kiểm tra nếu không có sản phẩm nào được tìm thấy
             if (!$product) {
@@ -123,7 +138,7 @@ class HomeController extends Controller
                 ->take(5) // Giới hạn số lượng sản phẩm liên quan
                 ->get();
 
-           
+
             // Định dạng lại dữ liệu sản phẩm liên quan
             $relatedProductsFormatted = $relatedProducts->map(function ($relatedProduct) {
                 return [
@@ -132,7 +147,7 @@ class HomeController extends Controller
                     'slug' => $relatedProduct->slug,
                     'brand' => $relatedProduct->brand->name,
                     'category' => $relatedProduct->category->name,
-                    'price'=> $relatedProduct->price,
+                    'price' => $relatedProduct->price,
                     'sku' => $relatedProduct->sku,
                     'image' => asset($relatedProduct->image),
                 ];
@@ -141,7 +156,7 @@ class HomeController extends Controller
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
                 'data' => [
-                    'product' => $product,
+                    'product' => $productFormatted,
                     'relatedProducts' => $relatedProductsFormatted,
                 ]
             ], Response::HTTP_OK);
@@ -242,4 +257,5 @@ class HomeController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
 }

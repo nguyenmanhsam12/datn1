@@ -25,6 +25,7 @@ class StoreProductVariant extends FormRequest
             'product_id' => 'required|exists:products,id',
             'size_id' => 'required|exists:sizes,id',
             'stock' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
         ];
     }
 

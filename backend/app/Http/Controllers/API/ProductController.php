@@ -117,7 +117,6 @@ class ProductController extends Controller
                 'description' => $validatedData['description'],
                 'brand_id' => $validatedData['brand_id'],
                 'category_id' => $validatedData['category_id'],
-                'price' => $validatedData['price'],
                 'sku' => $validatedData['sku'],
                 'image' => $imagePath,
                 'gallary' => json_encode($gallaryPaths),
@@ -137,6 +136,7 @@ class ProductController extends Controller
                         Log::warning('Variant already exists', [
                             'product_id' => $product->id,
                             'size_id' => $variant['size_id'],
+                            'price' => $variant['price'],
                         ]);
 
                         // Nếu biến thể đã tồn tại, bạn có thể quyết định không thêm nữa hoặc cập nhật
@@ -150,6 +150,7 @@ class ProductController extends Controller
                         'product_id' => $product->id,
                         'size_id' => $variant['size_id'],
                         'stock' => $variant['stock'],
+                        'price' => $variant['price'],
                     ]);
                 }
             }
@@ -435,6 +436,7 @@ class ProductController extends Controller
                 'product_id' => $validatedData['product_id'],
                 'size_id' => $validatedData['size_id'],
                 'stock' => $validatedData['stock'],
+                'price' => $validatedData['price'],
             ]);
 
             return response()->json([
