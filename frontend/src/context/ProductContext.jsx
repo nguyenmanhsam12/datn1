@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { addsingleVariant, createProduct, deleteProduct, fecthProduct } from '../services/productService';
+import { addsingleVariant, createProduct, deleteProduct, fecthProduct, updateProduct } from '../services/productService';
 import { useNavigate } from 'react-router-dom';
 
 const ProductContext = createContext();
@@ -42,8 +42,14 @@ export const ProductProvider = ({children}) => {
     const resdata = await fecthProduct();
     setProducts(resdata.data)
   }
+  
+  const editProduct = async (id, product)=>{
+    await updateProduct(id, product);
+    const updateProducts = await fecthProduct(); 
+    setCategories(updateProducts.data);
+  }
   return (
-    <ProductContext.Provider value={{products,addProduct, removeProduct, addVariant}}>
+    <ProductContext.Provider value={{products,addProduct, removeProduct, addVariant, editProduct}}>
         {children}
     </ProductContext.Provider>
   )

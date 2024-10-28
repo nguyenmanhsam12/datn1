@@ -108,7 +108,7 @@ const ListProduct = () => {
                           <span className="sr-only">Toggle Dropdown</span>
                         </button>
                         <div className="dropdown-menu" role="menu">
-                          <Link to={`/admin`} className="btn btn-info btn-sm dropdown-item"><i className="fas fa-pencil-alt"></i> Sửa</Link>
+                          <Link to={`/admin/edit-products/${product.id}`} className="btn btn-info btn-sm dropdown-item"><i className="fas fa-pencil-alt"></i> Sửa</Link>
                           <button onClick={() => removeProduct(product.id)} className="btn btn-danger btn-sm dropdown-item"><i className="fas fa-trash"></i> Xóa</button>
                           <button onClick={() => handleAddAttributeToggle(product.id)} className="btn btn-info btn-sm dropdown-item"><i className="fas fa-plus"></i> Thêm thuộc tính</button>
                           <Link to={`/admin`} className="btn btn-info btn-sm dropdown-item"><i className="fas fa-eye"></i> Xem thuộc tính</Link>
