@@ -15,6 +15,9 @@ import EditSize from './pages/admin/Size/edit-size'
 import ListProduct from './pages/admin/Product/products'
 import AddProduct from './pages/admin/Product/add-product'
 import EditProduct from './pages/admin/Product/edit-products'
+import ListVariant from './pages/admin/Variant/variant'
+import EditVariant from './pages/admin/Variant/edit-variant'
+
 
 const Routes = () => {
     const routes = useRoutes([
@@ -39,6 +42,10 @@ const Routes = () => {
             {path:'products',element:<ListProduct/>},
             {path:'add-products',element:<AddProduct/>},
             {path:'edit-products/:id',element:<EditProduct/>},
+
+            {path:'variants',element:<ListVariant/>},
+            {path:'edit-variants/:id',element:<EditVariant/>},
+            
         ]}
     ])
   return routes

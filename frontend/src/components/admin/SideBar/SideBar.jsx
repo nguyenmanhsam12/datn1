@@ -46,20 +46,20 @@ const SideBar = () => {
                     </p>
                     </Link>
                 </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link">
+                <li className="nav-item">
+                    <a href="" className="nav-link">
                     <p>
                         Brands
-                        <i class="right fas fa-angle-left"></i>
+                        <i className="right fas fa-angle-left"></i>
                     </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                    <li class="nav-item">
+                    <ul className="nav nav-treeview">
+                    <li className="nav-item">
                         <Link to={'brands'} class="nav-link">
                         <p>List Brand</p>
                         </Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to={'add-brands'} class="nav-link">
                         <p>Add Brand</p>
                         </Link>
@@ -67,20 +67,20 @@ const SideBar = () => {
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a href="" class="nav-link">
+                <li className="nav-item">
+                    <a href="" className="nav-link">
                     <p>
                         Categories
-                        <i class="right fas fa-angle-left"></i>
+                        <i className="right fas fa-angle-left"></i>
                     </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                    <li class="nav-item">
+                    <ul className="nav nav-treeview">
+                    <li className="nav-item">
                         <Link to={'categories'} class="nav-link">
                         <p>List Categories</p>
                         </Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to={'add-categories'} class="nav-link">
                         <p>Add Category</p>
                         </Link>
@@ -88,20 +88,20 @@ const SideBar = () => {
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a href="" class="nav-link">
+                <li className="nav-item">
+                    <a href="" className="nav-link">
                     <p>
                         Sizes
-                        <i class="right fas fa-angle-left"></i>
+                        <i className="right fas fa-angle-left"></i>
                     </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                    <li class="nav-item">
+                    <ul className="nav nav-treeview">
+                    <li className="nav-item">
                         <Link to={'sizes'} class="nav-link">
                         <p>List Sizes</p>
                         </Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to={'add-sizes'} class="nav-link">
                         <p>Add Size</p>
                         </Link>
@@ -110,22 +110,39 @@ const SideBar = () => {
                 </li>
 
 
-                <li class="nav-item">
-                    <a href="" class="nav-link">
+                <li className="nav-item">
+                    <a href="" className="nav-link">
                     <p>
                         Products
-                        <i class="right fas fa-angle-left"></i>
+                        <i className="right fas fa-angle-left"></i>
                     </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                    <li class="nav-item">
+                    <ul className="nav nav-treeview">
+                    <li className="nav-item">
                         <Link to={'products'} class="nav-link">
                         <p>List Products</p>
                         </Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to={'add-products'} class="nav-link">
                         <p>Add Product</p>
+                        </Link>
+                    </li>
+                    </ul>
+                </li>
+
+                {/* variant */}
+                <li className="nav-item">
+                    <a href="" className="nav-link">
+                    <p>
+                        Variants
+                        <i className="right fas fa-angle-left"></i>
+                    </p>
+                    </a>
+                    <ul className="nav nav-treeview">
+                    <li className="nav-item">
+                        <Link to={'variants'} class="nav-link">
+                        <p>List Variants</p>
                         </Link>
                     </li>
                     </ul>
