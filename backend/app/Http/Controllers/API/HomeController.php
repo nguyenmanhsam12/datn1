@@ -105,7 +105,6 @@ class HomeController extends Controller
                     'name' => $product->name,
                     'description' => $product->description,
                     'sku' => $product->sku,
-                    'price' => $product->price,
                     'brand' => $product->brand->name,
                     'category' => $product->category->name,
                     'image' => asset($product->image),
@@ -118,6 +117,7 @@ class HomeController extends Controller
                             'id' => $variant->id,
                             'size' => $variant->size->size,
                             'stock' => $variant->stock,
+                            'price' => $variant->price,
                         ];
                     })
                 ];
@@ -179,7 +179,7 @@ class HomeController extends Controller
         try {
             // Lấy danh mục theo slug và sản phẩm liên quan
             $category = Category::where('slug', $categorySlug)
-                ->with(['product.variants.images', 'product.brand'])
+                ->with(['product.variants', 'product.brand'])
                 ->first();
 
             // Kiểm tra nếu không tìm thấy danh mục

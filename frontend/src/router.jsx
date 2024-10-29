@@ -19,13 +19,21 @@ import ClientLayout from './layouts/ClientLayout'
 
 import ListVariant from './pages/admin/Variant/variant'
 import EditVariant from './pages/admin/Variant/edit-variant'
+import Home from './pages/client/Home/_Home'
+import Auth from './pages/client/Authentication/_Auth'
+import SingGle from './pages/client/SingleProduct/_singleProduct'
 
 
 
 const Routes = () => {
     const routes = useRoutes([
         //client
-        {path:'',element:<ClientLayout/>},
+        {path:'',element:<ClientLayout/>,children:[
+            {path:'',element:<Home/>},
+            {path:'/product/:slug',element:<SingGle/>},
+            {path:'auth/*',element:<Auth/>},
+            
+        ]},
         //admin
         {path:'admin', element:<AdminLayout/>,children:[
             {path:'',element:<Dashboard/>},
