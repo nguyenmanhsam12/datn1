@@ -6,7 +6,7 @@ const Slide = () => {
       <div className="slider-active owl-dot-style owl-carousel ">
         <div
           className="single-slider bg-img slider-height"
-          style={{ backgroundImage: "url(client_css/img/slider/slider-1/1.webp)" }}
+          style={{ backgroundImage: "url(client_css/img/slider/slider-1/slider1.png)" }}
         >
           <div className="layer-1 slider-animated-1">
             <h2 className="animated slider-title3 text-uppercase mb-0">

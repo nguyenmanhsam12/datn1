@@ -20,17 +20,20 @@ const AdminLayout = () => {
       "/plugins/summernote/summernote-bs4.min.css"
     ];
 
-    // Các file JS cần thiết
-    const jsFiles = [
+    // Các file JS không phụ thuộc thứ tự
+    const independentJsFiles = [
       "/plugins/jquery/jquery.min.js",
       "/plugins/jquery-ui/jquery-ui.min.js",
       "/plugins/bootstrap/js/bootstrap.bundle.min.js",
       "/plugins/chart.js/Chart.min.js",
       "/plugins/sparklines/sparkline.js",
       "/plugins/jqvmap/jquery.vmap.min.js",
-      "/plugins/jqvmap/maps/jquery.vmap.usa.js",
       "/plugins/jquery-knob/jquery.knob.min.js",
       "/plugins/moment/moment.min.js",
+    ];
+
+    // Các file JS phụ thuộc lẫn nhau (tải theo thứ tự)
+    const dependentJsFiles = [
       "/plugins/daterangepicker/daterangepicker.js",
       "/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js",
       "/plugins/summernote/summernote-bs4.min.js",
@@ -40,17 +43,41 @@ const AdminLayout = () => {
       "/dist/js/pages/dashboard.js"
     ];
 
-    // Thêm CSS vào <head>
-    cssFiles.forEach(href => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = href;
-      document.head.appendChild(link);
-    });
+    // Nạp CSS đồng thời
+    const loadCSS = () => {
+      return Promise.all(
+        cssFiles.map(href => {
+          return new Promise((resolve, reject) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = resolve;
+            link.onerror = reject;
+            document.head.appendChild(link);
+          });
+        })
+      );
+    };
 
-    // Thêm JS vào <body> và đảm bảo nạp đúng thứ tự
-    const loadScripts = async () => {
-      for (const src of jsFiles) {
+    // Nạp JS không phụ thuộc đồng thời
+    const loadIndependentJS = () => {
+      return Promise.all(
+        independentJsFiles.map(src => {
+          return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = false;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.body.appendChild(script);
+          });
+        })
+      );
+    };
+
+    // Nạp JS phụ thuộc lẫn nhau theo thứ tự
+    const loadDependentJS = async () => {
+      for (const src of dependentJsFiles) {
         await new Promise((resolve, reject) => {
           const script = document.createElement('script');
           script.src = src;
@@ -60,14 +87,16 @@ const AdminLayout = () => {
           document.body.appendChild(script);
         });
       }
-
-      // Khởi tạo jQuery UI bridge sau khi các script đã nạp
       if (window.$) {
         window.$.widget.bridge('uibutton', window.$.ui.button);
       }
     };
 
-    loadScripts().catch(error => console.error('Lỗi khi tải script:', error));
+    // Nạp CSS, sau đó JS không phụ thuộc, rồi đến JS phụ thuộc
+    loadCSS()
+      .then(loadIndependentJS)
+      .then(loadDependentJS)
+      .catch(error => console.error('Lỗi khi tải CSS/JS:', error));
 
     // Cleanup các thẻ khi component bị unmount
     return () => {
@@ -76,7 +105,7 @@ const AdminLayout = () => {
         if (link) link.remove();
       });
 
-      jsFiles.forEach(src => {
+      [...independentJsFiles, ...dependentJsFiles].forEach(src => {
         const script = document.body.querySelector(`script[src="${src}"]`);
         if (script) script.remove();
       });

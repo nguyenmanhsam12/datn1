@@ -19,6 +19,9 @@ const ProductArea = () => {
         }
         fetchProduct();
     },[])
+    
+    console.log(items);
+    
   return (
     <div className="product-area pt-80 pb-35">
       <div className="container">
@@ -84,7 +87,7 @@ const ProductArea = () => {
                     </h4>
                   </div>
                   <div className="fix">
-                    <span className="pro-price floatleft">{item.sku}</span>
+                    <span className="pro-price floatleft">{item.variant.price}</span>
                     <span className="pro-rating floatright">
                       <a href="#">
                         <i className="zmdi zmdi-star" />
