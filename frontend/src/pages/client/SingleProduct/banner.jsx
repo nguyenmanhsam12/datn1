@@ -2,20 +2,20 @@ import React from "react";
 
 const BannerSingle = () => {
   return (
-    <div classname="heading-banner-area overlay-bg">
-      <div classname="container">
-        <div classname="row">
-          <div classname="col-12">
-            <div classname="heading-banner">
-              <div classname="heading-banner-title">
-                <h2>Single Product</h2>
+    <div className="heading-banner-area overlay-bg">
+      <div className="container">
+        <div className="row">
+          <div className="col-md-12">
+            <div className="heading-banner">
+              <div className="heading-banner-title">
+                <h2>Chi Tiết Sản Phẩm </h2>
               </div>
-              <div classname="breadcumbs pb-15">
+              <div className="breadcumbs pb-15">
                 <ul>
                   <li>
-                    <a href="index.html">Home</a>
+                    <a href="index.html">Trang Chủ</a>
                   </li>
-                  <li>Single Product</li>
+                  <li>Chi tiết sản phẩm</li>
                 </ul>
               </div>
             </div>

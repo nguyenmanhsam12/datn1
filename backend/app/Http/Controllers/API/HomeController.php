@@ -18,11 +18,19 @@ class HomeController extends Controller
     public function getAllProduct()
     {
         try {
-            // Lấy tất cả sản phẩm cùng với thông tin biến thể chính và hình ảnh
-            $products = Product::with('brand', 'category')->limit(12)->get();
-            // định dạng lại dữ liệu sẽ được trả về
+            // Lấy các sản phẩm ra trang home với 8 sản phẩm mới nhất
+            $products = Product::with(['brand', 'category', 'variants'])
+                ->orderBy('id', 'desc')
+                ->limit(8) // Giới hạn số lượng sản phẩm
+                ->get();
+
             // Xử lý từng sản phẩm để trả về thông tin cần thiết
             $formatProductHome = $products->map(function ($product) {
+                // Tìm biến thể có giá thấp nhất
+                $cheapestVariant = $product->variants->isNotEmpty()
+                    ? $product->variants->sortBy('price')->first()
+                    : null;
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -33,8 +41,12 @@ class HomeController extends Controller
                     'brand' => $product->brand->name, // Lấy tên thương hiệu
                     'category' => $product->category->name, // Lấy tên danh mục
                     'category_id' => $product->category->id,
-                    'price' => $product->price,
                     'image' => asset($product->image),
+                    'variant' => $cheapestVariant ? [
+                        'size' => $cheapestVariant->size->size,
+                        'price' => $cheapestVariant->price,
+                        'stock' => $cheapestVariant->stock,
+                    ] : null, // Lấy biến thể có giá thấp nhất
                 ];
             });
 
@@ -189,8 +201,9 @@ class HomeController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            // Lấy danh sách sản phẩm từ quan hệ products trong Category
-            $products = $category->product;
+
+            // Lấy danh sách sản phẩm từ quan hệ products trong Category, giới hạn 8 sản phẩm mới nhất
+            $products = $category->product()->orderBy('id', 'desc')->limit(8)->get();
 
             // Kiểm tra nếu không có sản phẩm nào trong danh mục
             if ($products->isEmpty()) {
@@ -199,9 +212,35 @@ class HomeController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
 
+            // Xử lý từng sản phẩm để trả về thông tin cần thiết
+            $formatProductHome = $products->map(function ($product) {
+                // Tìm biến thể có giá thấp nhất
+                $cheapestVariant = $product->variants->isNotEmpty()
+                    ? $product->variants->sortBy('price')->first()
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'brand_id' => $product->brand->id,
+                    'brand' => $product->brand->name, // Lấy tên thương hiệu
+                    'category' => $product->category->name, // Lấy tên danh mục
+                    'category_id' => $product->category->id,
+                    'image' => asset($product->image),
+                    'variant' => $cheapestVariant ? [
+                        'size' => $cheapestVariant->size->size,
+                        'price' => $cheapestVariant->price,
+                        'stock' => $cheapestVariant->stock,
+                    ] : null, // Lấy biến thể có giá thấp nhất
+                ];
+            });
+
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $products,
+                'data' => $formatProductHome,
             ], Response::HTTP_OK);
         } catch (\Throwable $th) {
             // Ghi log lỗi
@@ -214,7 +253,7 @@ class HomeController extends Controller
                 'message' => 'Lấy danh sách không thành công'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
+}
     // Sản phẩm dựa theo thương hiệu
     public function getAllProBrand($brandSlug)
     {

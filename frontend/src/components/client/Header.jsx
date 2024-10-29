@@ -9,38 +9,38 @@ const Header = () => {
           <div className="row">
             <div className="col-12 col-md-6">
               <div className="welcome-mes">
-                <p>Welcome Greentech store!</p>
+                <p>Xin Chào Mừng!</p>
               </div>
             </div>
             <div className="col-12 col-md-6">
               <div className="header-right-menu text-center text-md-end">
                 <ul>
                   <li>
-                    <a href="#">Account</a>
+                    <a href="#">Tài Khoản</a>
                     <i className="zmdi zmdi-chevron-down" />
                     <ul>
                       <li>
-                        <a href="my-account.html">My Account</a>
+                        <a href="#">Tài Khoản Của Tôi</a>
                       </li>
                       <li>
-                        <a href="wishlist.html">My Wishlist</a>
+                        <a href="#">Yêu Thích</a>
                       </li>
                       <li>
-                        <a href="cart.html">My Cart</a>
+                        <a href="#">Giỏ Hàng</a>
                       </li>
                       <li>
-                        <a href="checkout.html">Checkout</a>
+                        <a href="#">Thanh Toán</a>
                       </li>
                       <li>
-                        <a href="order.html">Order</a>
+                        <a href="#">Đơn Hàng</a>
                       </li>
                       <li>
-                        <a href="login.html">Log in</a>
+                        <a href="#">Đăng Nhập</a>
                       </li>
                     </ul>
                   </li>
                   <li>
-                    <a href="#">usd</a>
+                    <a href="#">vnd</a>
                     <i className="zmdi zmdi-chevron-down" />
                     <ul>
                       <li>
@@ -52,7 +52,7 @@ const Header = () => {
                     </ul>
                   </li>
                   <li>
-                    <a href="#">English</a>
+                    <a href="#">Vietnamese</a>
                     <i className="zmdi zmdi-chevron-down" />
                     <ul>
                       <li>
@@ -77,7 +77,7 @@ const Header = () => {
             {/* logo start */}
             <div className="col-md col-6">
               <div className="top-logo">
-                <a href="index.html">
+                <a href="">
                   <img src="/client_css/img/logo/logo.webp" alt />
                 </a>
               </div>
@@ -90,207 +90,66 @@ const Header = () => {
                 <nav>
                   <ul>
                     <li className="expand">
-                      <a href="index.html">Home</a>
-                      <ul className="restrain sub-menu">
-                        <li>
-                          <a href="index.html">Home V1</a>
-                        </li>
-                        <li>
-                          <a href="index-2.html">Home V2</a>
-                        </li>
-                      </ul>
+                      <a href="">Trang Chủ</a>
                     </li>
                     <li className="expand">
-                      <a href="about.html">About</a>
+                      <a href="">Giới Thiệu</a>
                     </li>
                     <li className="expand position-static">
-                      <a href="single-product.html">Man</a>
-                      <div className="restrain mega-menu megamenu1">
-                        <span>
-                          <a className="mega-menu-title" href="shop-grid.html">
-                            {" "}
-                            Dresses{" "}
-                          </a>
-                          <a href="single-product.html">Coctail</a>
-                          <a href="single-product.html">Day</a>
-                          <a href="single-product.html">Evening </a>
-                          <a href="single-product.html">Sports</a>
-                        </span>
-                        <span>
-                          <a className="mega-menu-title" href="shop-grid.html">
-                            {" "}
-                            Handbags{" "}
-                          </a>
-                          <a href="single-product.html">Blazers</a>
-                          <a href="single-product.html">Table</a>
-                          <a href="single-product.html">Coats</a>
-                          <a href="single-product.html">Kids</a>
-                        </span>
-                        <span>
-                          <a className="mega-menu-title" href="shop-grid.html">
-                            {" "}
-                            Clothing{" "}
-                          </a>
-                          <a href="single-product.html">T-Shirt</a>
-                          <a href="single-product.html">Coats</a>
-                          <a href="single-product.html">Jackets</a>
-                          <a href="single-product.html">Jeans</a>
-                        </span>
-                        <span className="block-last">
-                          <img
-                            className="img-fluid"
-                            src="img/megamenu/block_menu.webp"
-                            alt
-                          />
-                        </span>
-                      </div>
-                    </li>
-                    <li className="expand position-static">
-                      <a href="single-product.html">Women</a>
+                      <a href="">Cửa Hàng</a>
                       <div className="restrain mega-menu megamenu2">
                         <span>
-                          <a className="mega-menu-title" href="shop-grid.html">
+                          <a className="mega-menu-title" href="">
                             Rings
                           </a>
-                          <a href="single-product.html">Coats &amp; Jackets</a>
-                          <a href="single-product.html">Blazers</a>
-                          <a href="single-product.html">Jackets</a>
-                          <a href="single-product.html">Rincoats</a>
+                          <a href="">Coats &amp; Jackets</a>
+                          <a href="">Blazers</a>
+                          <a href="">Jackets</a>
+                          <a href="">Rincoats</a>
                         </span>
                         <span>
                           <a
                             className="mega-menu-title"
-                            href="single-product.html"
+                            href=""
                           >
                             Dresses
                           </a>
-                          <a href="single-product.html">Ankle Boots</a>
-                          <a href="single-product.html">Footwear</a>
-                          <a href="single-product.html">Clog Sandals</a>
-                          <a href="single-product.html">Combat Boots</a>
+                          <a href="">Ankle Boots</a>
+                          <a href="">Footwear</a>
+                          <a href="">Clog Sandals</a>
+                          <a href="">Combat Boots</a>
                         </span>
                         <span>
                           <a
                             className="mega-menu-title"
-                            href="single-product.html"
+                            href=""
                           >
                             Accessories
                           </a>
-                          <a href="single-product.html">Bootees bags</a>
-                          <a href="single-product.html">Blazers</a>
-                          <a href="single-product.html">Jackets</a>
-                          <a href="single-product.html">Shoes</a>
+                          <a href="">Bootees bags</a>
+                          <a href="">Blazers</a>
+                          <a href="">Jackets</a>
+                          <a href="">Shoes</a>
                         </span>
                         <span className="block-last">
                           <a
                             className="mega-menu-title"
-                            href="single-product.html"
+                            href=""
                           >
                             Top
                           </a>
-                          <a href="single-product.html">Briefs</a>
-                          <a href="single-product.html">Camis</a>
-                          <a href="single-product.html">Nigntwears</a>
-                          <a href="single-product.html">Shapewears</a>
-                        </span>
-                      </div>
-                    </li>
-                    <li className="expand position-static">
-                      <a href="shop.html">Shop</a>
-                      <div className="restrain mega-menu megamenu4">
-                        <span>
-                          <a className="mega-menu-title" href="shop.html">
-                            Shop Pages
-                          </a>
-                          <a href="shop-list.html">List View </a>
-                          <a href="shop.html">Grid View</a>
-                          <a href="shop-sidebar.html">Shop Sidebar</a>
-                          <a href="shop-list-right-sidebar.html">
-                            Shop List Sidebar
-                          </a>
-                          <a href="shop-grid-right-sidebar.html">
-                            Shop Grid Sidebar
-                          </a>
-                          <a href="single-product.html">Single Product</a>
-                          <a href="single-product-sidebar.html">
-                            Single Product Sidebar
-                          </a>
-                        </span>
-                        <span className="block-last">
-                          <a
-                            className="mega-menu-title"
-                            href="product-details.html"
-                          >
-                            Shop Page
-                          </a>
-                          <a href="my-account.html">My Account</a>
-                          <a href="wishlist.html">Wishlist</a>
-                          <a href="cart.html">Cart </a>
-                          <a href="checkout.html">Checkout </a>
-                          <a href="login.html">Login</a>
-                          <a href="order.html">Order</a>
+                          <a href="">Briefs</a>
+                          <a href="">Camis</a>
+                          <a href="">Nigntwears</a>
+                          <a href="">Shapewears</a>
                         </span>
                       </div>
                     </li>
                     <li className="expand">
-                      <a href="#">Pages</a>
-                      <ul className="restrain sub-menu">
-                        <li>
-                          <a href="about.html">About Us</a>
-                        </li>
-                        <li>
-                          <a href="contact.html">Contact Us</a>
-                        </li>
-                        <li>
-                          <a href="checkout.html">Checkout</a>
-                        </li>
-                        <li>
-                          <a href="login.html">Login</a>
-                        </li>
-                        <li>
-                          <a href="my-account.html">My Account</a>
-                        </li>
-                        <li>
-                          <a href="order.html">Order</a>
-                        </li>
-                        <li>
-                          <a href="single-product.html">Product Details</a>
-                        </li>
-                        <li>
-                          <a href="shop.html">Shop Grid</a>
-                        </li>
-                        <li>
-                          <a href="shop-list.html">Shop List</a>
-                        </li>
-                        <li>
-                          <a href="cart.html">Shopping cart</a>
-                        </li>
-                        <li>
-                          <a href="wishlist.html">Wishlist</a>
-                        </li>
-                        <li>
-                          <a href="404.html">404 Error</a>
-                        </li>
-                      </ul>
+                      <a href="">Tin Tức</a>
                     </li>
                     <li className="expand">
-                      <a href="blog.html">Blog</a>
-                      <ul className="restrain sub-menu">
-                        <li>
-                          <a href="blog.html">Blog</a>
-                        </li>
-                        <li>
-                          <a href="single-blog.html">Single Blog</a>
-                        </li>
-                        <li>
-                          <a href="single-blog-sidebar.html">
-                            Single Blog Sidebar
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li className="expand">
-                      <a href="contact.html">Contact</a>
+                      <a href="">Liên Hệ</a>
                     </li>
                   </ul>
                 </nav>
