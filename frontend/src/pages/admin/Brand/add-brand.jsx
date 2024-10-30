@@ -20,16 +20,16 @@ const AddBrand = () => {
     };
   return (
     <div className="content-wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                <div class="col-sm-6">
+        <section className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                <div className="col-sm-6">
                     <h1>Brands Add Form</h1>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Add Brand</li>
+                <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right">
+                    <li className="breadcrumb-item"><a href="#">Home</a></li>
+                    <li className="breadcrumb-item active">Add Brand</li>
                     </ol>
                 </div>
                 </div>
@@ -39,12 +39,12 @@ const AddBrand = () => {
             <div className="card-body">
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Brand</label>
-                    <input name='name' defaultValue={formData.name} onChange={handleChange} type="text" className="form-control" id="exampleInputEmail1" placeholder="name brand" />
+                    <input name='name' defaultValue={formData.name} onChange={handleChange} type="text" className="form-control" id="exampleInputEmail1" placeholder="nhập thương hiệu" />
                 </div>
             </div>
             {/* /.card-body */}
             <div className="card-footer">
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Thêm mới</button>
             </div>
         </form>
     </div>

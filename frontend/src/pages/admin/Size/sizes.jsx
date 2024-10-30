@@ -7,16 +7,17 @@ const ListSize = () => {
 
     return (
         <div className="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                    <div class="col-sm-6">
+            <section className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                    <div className="col-sm-6">
                         <h1>Sizes Tables</h1>
+                        <Link to={'/admin/add-sizes'} className='btn btn-success mt-3'>Thêm kích cỡ</Link>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">List Size</li>
+                    <div className="col-sm-6">
+                        <ol className="breadcrumb float-sm-right">
+                        <li className="breadcrumb-item"><a href="#">Home</a></li>
+                        <li className="breadcrumb-item active">List Size</li>
                         </ol>
                     </div>
                     </div>
@@ -38,11 +39,14 @@ const ListSize = () => {
                     </div>
                 </div>
                 {/* /.card-header */}
+                
+                
                 <div className="card-body table-responsive p-0">
+                     
                     <table className="table table-hover text-nowrap">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>STT</th>
                             <th>Size</th>
                             <th>Action</th>
                         </tr>
@@ -53,8 +57,8 @@ const ListSize = () => {
                             <td>{i+1}</td>
                             <td>{s.size}</td>
                             <td>
-                                <Link to={`/admin/edit-sizes/${s.id}`} className="btn btn-info btn-sm"><i class="fas fa-pencil-alt"></i> Sửa</Link>
-                                <button onClick={()=>removeSize(s.id)} className="ml-3 btn btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                                <Link to={`/admin/edit-sizes/${s.id}`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
+                                <button onClick={()=>removeSize(s.id)} className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
                             </td>
                         </tr>
                         ))}

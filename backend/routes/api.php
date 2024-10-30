@@ -45,17 +45,25 @@ Route::get('/detailReview/{id}', [ReviewsController::class, 'getDetail'])->middl
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// tất cả sp
+// lấy tất cả sp
+Route::get('/allProduct', [HomeController::class, 'allProduct']);
+
+
+// 8 sản phẩm mới nhất trên home
 Route::get('/getAllProduct', [HomeController::class, 'getAllProduct']);
 
 // lấy tất cả danh mục
 Route::get('/AllCategory', [HomeController::class, 'AllCategory']);
 
-// lấy sp dựa theo slug danh mục
+// 8 sp mới nhất theo danh mục trên home
 Route::get('/getAllProCate/{categorySlug}', [HomeController::class, 'getAllProCate']);
 
-// lấy sp theo thương hiệu
+// lấy tất cả sp theo thương hiệu
 Route::get('/getAllProBrand/{brandSlug}', [HomeController::class, 'getAllProBrand']);
+
+// lấy tất cả sản phẩm theo danh mục
+Route::get('/allProductCategory/{categorySlug}', [HomeController::class, 'allProductCategory']);
+
 
 // chi tiết sản phẩm
 Route::get('/getProductBySlug/{slug}', [HomeController::class, 'getProductBySlug']);

@@ -7,16 +7,17 @@ const ListBrand = () => {
 
     return (
         <div className="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                    <div class="col-sm-6">
+            <section className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                    <div className="col-sm-6">
                         <h1>Brands Tables</h1>
+                        <Link to={'/admin/add-brands'} className='btn btn-success mt-3'>Thêm thương hiệu</Link>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">List Brand</li>
+                    <div className="col-sm-6">
+                        <ol className="breadcrumb float-sm-right">
+                        <li className="breadcrumb-item"><a href="#">Home</a></li>
+                        <li className="breadcrumb-item active">List Brand</li>
                         </ol>
                     </div>
                     </div>
@@ -55,8 +56,8 @@ const ListBrand = () => {
                             <td>{brand.name}</td>
                             <td>{brand.slug}</td>
                             <td>
-                                <Link to={`/admin/edit-brands/${brand.id}`} className="btn btn-info btn-sm"><i class="fas fa-pencil-alt"></i> Sửa</Link>
-                                <button onClick={()=>removeBrand(brand.id)} className="ml-3 btn btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                                <Link to={`/admin/edit-brands/${brand.id}`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
+                                <button onClick={()=>removeBrand(brand.id)} className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
                             </td>
                         </tr>
                         ))}

@@ -39,16 +39,16 @@ const EditSize = () => {
     };
   return (
     <div className="content-wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                <div class="col-sm-6">
+        <section className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                <div className="col-sm-6">
                     <h1>Size Edit Form</h1>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Edit Size</li>
+                <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right">
+                    <li className="breadcrumb-item"><a href="#">Home</a></li>
+                    <li className="breadcrumb-item active">Edit Size</li>
                     </ol>
                 </div>
                 </div>
