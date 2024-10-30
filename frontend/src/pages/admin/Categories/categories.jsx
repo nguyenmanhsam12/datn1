@@ -9,16 +9,17 @@ const ListCategories = () => {
 
     return (
         <div className="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                    <div class="col-sm-6">
+            <section className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                    <div className="col-sm-6">
                         <h1>Categories Tables</h1>
+                        <Link to={'/admin/add-categories'} className='btn btn-success mt-3'>Thêm danh mục</Link>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">List Categories</li>
+                    <div className="col-sm-6">
+                        <ol className="breadcrumb float-sm-right">
+                        <li className="breadcrumb-item"><a href="#">Home</a></li>
+                        <li className="breadcrumb-item active">List Categories</li>
                         </ol>
                     </div>
                     </div>
@@ -62,8 +63,8 @@ const ListCategories = () => {
                             <td>{parentName}</td>
                             <td>{category.slug}</td>
                             <td>
-                                <Link to={`/admin/edit-categories/${category.id}`} className="btn btn-info btn-sm"><i class="fas fa-pencil-alt"></i> Sửa</Link>
-                                <button onClick={()=>removeCategory(category.id)} className="ml-3 btn btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                                <Link to={`/admin/edit-categories/${category.id}`} className="btn btn-info btn-sm"><i className="fas fa-pencil-alt"></i> Sửa</Link>
+                                <button onClick={()=>removeCategory(category.id)} className="ml-3 btn btn-danger btn-sm"><i className="fas fa-trash"></i> Xóa</button>
                             </td>
                         </tr>
                         )})}

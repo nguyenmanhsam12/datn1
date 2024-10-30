@@ -44,7 +44,7 @@ class SizeController extends Controller
             Log::info(['info'],$request->all());
 
             $data = $request->validate([
-                'size'=>'required|string|min:6|max:255|unique:sizes,size'
+                'size'=>'required|string|min:2|max:255|unique:sizes,size'
             ]);
 
             $size = Size::create($data);
@@ -82,7 +82,7 @@ class SizeController extends Controller
             $size = Size::findOrFail($id);
 
             $data = $request->validate([
-                'size'=>['required','string','min:6','max:255',Rule::unique('sizes')->ignore($size)]
+                'size'=>['required','string','min:2','max:255',Rule::unique('sizes')->ignore($size)]
             ]);
 
             $size->update($data);

@@ -14,7 +14,67 @@ use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
-    // Tất cả sản phẩm
+    // lấy tất cả sp
+    public function allProduct()
+    {
+        try {
+            // Lấy các sản phẩm ra trang home với 8 sản phẩm mới nhất
+            $products = Product::with(['brand', 'category', 'variants'])
+                ->orderBy('id', 'desc')
+                ->get();
+
+            // Xử lý từng sản phẩm để trả về thông tin cần thiết
+            $formatProductHome = $products->map(function ($product) {
+                // Tìm biến thể có giá thấp nhất
+                $cheapestVariant = $product->variants->isNotEmpty()
+                    ? $product->variants->sortBy('price')->first()
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'brand_id' => $product->brand->id,
+                    'brand' => $product->brand->name, // Lấy tên thương hiệu
+                    'category' => $product->category->name, // Lấy tên danh mục
+                    'category_id' => $product->category->id,
+                    'image' => asset($product->image),
+                    'variant' => $cheapestVariant ? [
+                        'size' => $cheapestVariant->size->size,
+                        'price' => $cheapestVariant->price,
+                        'stock' => $cheapestVariant->stock,
+                    ] : null, // Lấy biến thể có giá thấp nhất
+                ];
+            });
+
+            return response()->json([
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $formatProductHome,
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            // Ghi log lỗi
+            Log::error(__CLASS__ . '@' . __FUNCTION__, [
+                'line' => $th->getLine(),
+                'message' => $th->getMessage(),
+            ]);
+
+            // Xử lý ngoại lệ ModelNotFoundException
+            if ($th instanceof ModelNotFoundException) {
+                return response()->json([
+                    'message' => 'Lấy danh sách không thành công'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Trả về lỗi không xác định
+            return response()->json([
+                'message' => 'Lấy danh sách không thành công'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // lấy sản phẩm ra trang home 8 sp mới nhất
     public function getAllProduct()
     {
         try {
@@ -113,26 +173,26 @@ class HomeController extends Controller
                 ->first(); // Sử dụng first() để lấy một sản phẩm
 
             $productFormatted = (object)[
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'description' => $product->description,
-                    'sku' => $product->sku,
-                    'brand' => $product->brand->name,
-                    'category' => $product->category->name,
-                    'image' => asset($product->image),
-                    'gallary' => collect(json_decode($product->gallary))
-                        ->map(function ($image) {
-                            return asset($image);
-                        }),
-                    'variants' => $product->variants->map(function ($variant) {
-                        return [
-                            'id' => $variant->id,
-                            'size' => $variant->size->size,
-                            'stock' => $variant->stock,
-                            'price' => $variant->price,
-                        ];
-                    })
-                ];
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'sku' => $product->sku,
+                'brand' => $product->brand->name,
+                'category' => $product->category->name,
+                'image' => asset($product->image),
+                'gallary' => collect(json_decode($product->gallary))
+                    ->map(function ($image) {
+                        return asset($image);
+                    }),
+                'variants' => $product->variants->map(function ($variant) {
+                    return [
+                        'id' => $variant->id,
+                        'size' => $variant->size->size,
+                        'stock' => $variant->stock,
+                        'price' => $variant->price,
+                    ];
+                })
+            ];
 
 
             // Kiểm tra nếu không có sản phẩm nào được tìm thấy
@@ -147,7 +207,7 @@ class HomeController extends Controller
                 ->where('category_id', $product->category_id) // Cùng danh mục
                 ->where('brand_id', $product->brand_id) // Cùng thương hiệu
                 ->where('id', '!=', $product->id) // Ngoại trừ sản phẩm hiện tại
-                ->take(5) // Giới hạn số lượng sản phẩm liên quan
+                ->take(4) // Giới hạn số lượng sản phẩm liên quan
                 ->get();
 
 
@@ -185,7 +245,7 @@ class HomeController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    // Sản phẩm dựa theo danh mục
+    // Sản phẩm dựa theo danh mục trên trang home lấy 8 sp mới nhất
     public function getAllProCate($categorySlug)
     {
         try {
@@ -253,14 +313,14 @@ class HomeController extends Controller
                 'message' => 'Lấy danh sách không thành công'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-}
+    }
     // Sản phẩm dựa theo thương hiệu
     public function getAllProBrand($brandSlug)
     {
         try {
             // Lấy danh mục theo slug và sản phẩm liên quan
             $brand = Brand::where('slug', $brandSlug)
-                ->with(['product.variants.images', 'product.category'])
+                ->with(['product.variants', 'product.category'])
                 ->first();
 
             // Kiểm tra nếu không tìm thấy danh mục
@@ -270,19 +330,46 @@ class HomeController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            // Lấy danh sách sản phẩm từ quan hệ products trong Category
+            // Lấy danh sách sản phẩm từ quan hệ products trong brands
             $products = $brand->product;
 
-            // Kiểm tra nếu không có sản phẩm nào trong danh mục
+            // Kiểm tra nếu không có sản phẩm nào trong thương hiệu
             if ($products->isEmpty()) {
                 return response()->json([
-                    'message' => 'Không tìm thấy sản phẩm nào thuộc danh mục này.'
+                    'message' => 'Không tìm thấy sản phẩm nào thuộc thương hiệu này.'
                 ], Response::HTTP_NOT_FOUND);
             }
 
+            $formatProductHome = $products->map(function ($product) {
+                // Tìm biến thể có giá thấp nhất
+                $cheapestVariant = $product->variants->isNotEmpty()
+                    ? $product->variants->sortBy('price')->first()
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'brand_id' => $product->brand->id,
+                    'brand' => $product->brand->name, // Lấy tên thương hiệu
+                    'category' => $product->category->name, // Lấy tên danh mục
+                    'category_id' => $product->category->id,
+                    'image' => asset($product->image),
+                    'variant' => $cheapestVariant ? [
+                        'size' => $cheapestVariant->size->size,
+                        'price' => $cheapestVariant->price,
+                        'stock' => $cheapestVariant->stock,
+                    ] : null, // Lấy biến thể có giá thấp nhất
+                ];
+            });
+
+
+
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $products,
+                'data' => $formatProductHome,
             ], Response::HTTP_OK);
         } catch (\Throwable $th) {
             // Ghi log lỗi
@@ -296,5 +383,73 @@ class HomeController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+
+    // lấy tất cả sản phẩm dựa theo danh mục
+    public function allProductCategory($categorySlug)
+    {
+        try {
+            // Lấy danh mục theo slug và sản phẩm liên quan
+            $category = Category::where('slug', $categorySlug)
+                ->with(['product.variants', 'product.brand'])
+                ->first();
+
+            // Kiểm tra nếu không tìm thấy danh mục
+            if (!$category) {
+                return response()->json([
+                    'message' => 'Không tìm thấy danh mục nào.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+
+            // Lấy danh sách sản phẩm từ quan hệ products trong Category, giới hạn 8 sản phẩm mới nhất
+            $products = $category->product;
+            // Kiểm tra nếu không có sản phẩm nào trong danh mục
+            if ($products->isEmpty()) {
+                return response()->json([
+                    'message' => 'Không tìm thấy sản phẩm nào thuộc danh mục này.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $formatProductHome = $products->map(function ($product) {
+                // Tìm biến thể có giá thấp nhất
+                $cheapestVariant = $product->variants->isNotEmpty()
+                    ? $product->variants->sortBy('price')->first()
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'brand_id' => $product->brand->id,
+                    'brand' => $product->brand->name, // Lấy tên thương hiệu
+                    'category' => $product->category->name, // Lấy tên danh mục
+                    'category_id' => $product->category->id,
+                    'image' => asset($product->image),
+                    'variant' => $cheapestVariant ? [
+                        'size' => $cheapestVariant->size->size,
+                        'price' => $cheapestVariant->price,
+                        'stock' => $cheapestVariant->stock,
+                    ] : null, // Lấy biến thể có giá thấp nhất
+                ];
+            });
+
+            return response()->json([
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $formatProductHome,
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            // Ghi log lỗi
+            Log::error(__CLASS__ . '@' . __FUNCTION__, [
+                'line' => $th->getLine(),
+                'message' => $th->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => 'Lấy danh sách không thành công'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

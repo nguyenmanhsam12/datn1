@@ -21,16 +21,16 @@ const AddCategory = () => {
     };
   return (
     <div className="content-wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                <div class="col-sm-6">
+        <section className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                <div className="col-sm-6">
                     <h1>Category Add Form</h1>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Add Category</li>
+                <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right">
+                    <li className="breadcrumb-item"><a href="#">Home</a></li>
+                    <li className="breadcrumb-item active">Add Category</li>
                     </ol>
                 </div>
                 </div>
@@ -40,7 +40,7 @@ const AddCategory = () => {
             <div className="card-body">
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Category</label>
-                    <input name='name' defaultValue={formData.name} onChange={handleChange} type="text" className="form-control" id="exampleInputEmail1" placeholder="name category" />
+                    <input name='name' defaultValue={formData.name} onChange={handleChange} type="text" className="form-control" id="exampleInputEmail1" placeholder="nhập tên danh mục" />
                 </div>
                 <div className="form-group">
                     <select 
@@ -48,7 +48,7 @@ const AddCategory = () => {
                         name="parent_id"
                         value={formData.parent_id}
                         onChange={handleChange} 
-                        class="form-control custom-select">
+                        className="form-control custom-select">
                             <option selected="" disabled="">Select one</option>
                             {categories.map((category)=>(
                                 <option key={category.id} value={category.id}>{category.name}</option>
@@ -58,7 +58,7 @@ const AddCategory = () => {
             </div>
             {/* /.card-body */}
             <div className="card-footer">
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Thêm mới</button>
             </div>
         </form>
     </div>
