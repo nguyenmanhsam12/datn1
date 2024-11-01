@@ -5,8 +5,10 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\CategoryNewController;
 use App\Http\Controllers\API\ColorController;
 use App\Http\Controllers\API\HomeController;
+use App\Http\Controllers\API\NewController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ProductVariantController;
@@ -73,6 +75,17 @@ Route::prefix('Wishlist')->group(function () {
     Route::get('/', [WishlistsController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/storeWishlist', [WishlistsController::class, 'storeWishlists'])->middleware('auth:sanctum');
     Route::delete('/deleteWishlist/{product_id}', [WishlistsController::class, 'deleteWishlists'])->middleware('auth:sanctum');
+});
+
+// Route  danh mục của bài viết
+Route::prefix('categoryNews')->group(function () {
+    Route::get('/', [CategoryNewController::class, 'index']); // Lấy danh sách tất cả danh mục
+    Route::get('/show/{id}', [CategoryNewController::class, 'show']); // Lấy thông tin danh mục theo ID
+});
+// Route  bài viết
+Route::prefix('News')->group(function () {
+    Route::get('/', [NewController::class, 'index']); // Lấy danh sách tất cả bài viết
+    Route::get('/show/{id}', [NewController::class, 'show']); // Lấy thông tin bài viết theo ID
 });
 
 Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -157,6 +170,24 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
         Route::post('/storeWishlist', [WishlistsController::class, 'storeWishlists']);
         Route::delete('/deleteWishlist/{product_id}', [WishlistsController::class, 'deleteWishlists']);
     });
+
+    // Thêm tin tức 
+    // Route cho danh mục của bài viết
+    Route::prefix('AdCategoryNews')->group(function () {
+    Route::get('/', [CategoryNewController::class, 'index']); // Lấy danh sách tất cả danh mục
+    Route::post('/store', [CategoryNewController::class, 'store']); // Tạo một danh mục mới
+    Route::get('/show/{id}', [CategoryNewController::class, 'show']); // Lấy thông tin danh mục theo ID
+    Route::put('/update/{id}', [CategoryNewController::class, 'update']); // Cập nhật thông tin danh mục
+    Route::delete('/destroy/{id}', [CategoryNewController::class, 'destroy']); // Xóa danh mục
+    });
+    // Route cho bài viết
+    Route::prefix('AdNews')->group(function () {
+    Route::get('/', [NewController::class, 'index']); // Lấy danh sách tất cả bài viết
+    Route::post('/store', [NewController::class, 'store']); // Tạo một bài viết mới
+    Route::get('/show/{id}', [NewController::class, 'show']); // Lấy thông tin bài viết theo ID
+    Route::put('/update/{id}', [NewController::class, 'update']); // Cập nhật thông tin bài viết
+    Route::delete('/destroy/{id}', [NewController::class, 'destroy']); // Xóa bài viết
+    });
 });
 
 Route::get('/check-payment/{order_id}', [OrderController::class, 'checkPayment'])->name('orders.check_payment');
@@ -168,3 +199,6 @@ Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index'])->name('orders.index')->middleware('auth:sanctum');
     Route::post('/store', [OrderController::class, 'store'])->middleware('auth:sanctum');
 });
+
+
+
