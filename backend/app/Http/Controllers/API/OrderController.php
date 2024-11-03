@@ -8,11 +8,15 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\CartCollection;
 use App\Mail\PayTheBillMail;
 use App\Models\Cart;
+use App\Models\District;
 use App\Models\Order;
 use App\Models\OrderAddresses;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\Province;
 use App\Models\User;
+use App\Models\Voucher;
+use App\Models\Ward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -21,11 +25,11 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-   
+    protected $cart;
 
-    public function __construct()
+    public function __construct(Cart $cart)
     {
-       
+        $this->cart = $cart;
     }
 
     public function index(Request $request)
@@ -47,19 +51,93 @@ class OrderController extends Controller
     public function store(StoreOrderRequest $request)
     {
         $user = auth()->user();
+        $code = $request->code;
         $cartItemIds = $request->cart_item_ids;
+
         $carts = Cart::with('cartItems')->where('user_id', $user->id)->first();
         if (empty($carts)) {
             return response()->json(['message' => 'Giỏ hàng trống!'], 400);
         }
+
+        $discountAmount = 0;
+        if (!empty($code)) {
+            $voucher = Voucher::query()->where('code', $code)->first();
+
+            if (!$voucher) {
+                return response()->json(['result' => false, 'error' => 'Mã giảm giá không tồn tại'], 404);
+            }
+
+            if ($voucher->usage_limit <= 0) {
+                return response()->json(['result' => false,'error' => 'Mã giảm giá đã hết lượt sử dụng'], 400);
+            }
+//
+            $userVoucherUsage = Order::where('user_id', $user->id)
+                ->where('voucher_id', $voucher->id)
+                ->count();
+
+            if ($userVoucherUsage > 0) {
+                return response()->json(['result' => false,'error' => 'Bạn đã sử dụng mã giảm giá này'], 400);
+            }
+
+            $currentDate = now();
+            if ($currentDate < $voucher->start_date || $currentDate > $voucher->expiry_date) {
+                return response()->json(['result' => false,'error' => 'Mã giảm giá đã hết hạn hoặc chưa đến thời gian áp dụng'], 400);
+            }
+            $total = $this->processCartItems($carts, null, $cartItemIds);
+
+            if ($total < $voucher->min_order_value) {
+                return response()->json(['result' => false,'error' => 'Giá trị đơn hàng không đủ để áp dụng mã giảm giá'], 400);
+            }
+
+            if ($voucher->discount_type === 'fixed') {
+                $discountAmount = (float)$voucher->discount_value;
+            } elseif ($voucher->discount_type === 'percentage') {
+                $discountAmount = $total * ((float)$voucher->discount_value / 100);
+
+                if ($voucher->max_discount_value !== null) {
+                    $discountAmount = min($discountAmount, (float)$voucher->max_discount_value);
+                }
+            }
+
+        }
         $order = Order::createOrder($user, $request);
         $totalAmount = $this->processCartItems($carts, $order, $cartItemIds);
-        $order->updateTotalAmount($totalAmount);
+        $order->updateTotalAmount($totalAmount, $discountAmount);
         if ($request->payment_method == "momo") {
-            return $this->paymentMomo($order);
+            return $this->paymentMomo($order, $cartItemIds);
         } else if ($request->payment_method == "vnpay") {
-            return $this->paymentVnPay($order);
+            return $this->paymentVnPay($order, $cartItemIds);
         }
+
+        $order = Order::findOrFail($order->id);
+        $carts = Cart::with(['cartItems' => function ($query) use ($cartItemIds) {
+            $query->whereIn('id', $cartItemIds);
+        }])->where('user_id', $order->user_id)->firstOrFail();
+
+        $user = User::findOrFail($order->user_id);
+        $contentAndData = [
+            'subject' => 'Web bán hàng',
+            'body' => 'Bạn đã đặt đơn thành công!',
+            'listCart' => $carts->cartItems,
+            'user' => $user,
+            'order' => $order,
+            'payment_status' => "Chưa thanh toán",
+        ];
+        $order->payment_status = Order::UNPAID;
+        $order->save();
+        Mail::to($user->email)->send(new PayTheBillMail($contentAndData));
+
+        foreach ($carts->cartItems as $cartItem) {
+            if (in_array($cartItem->id, $cartItemIds)) {
+                $cartItem->delete();
+            }
+        }
+
+        return response()->json([
+            'result' => true,
+            'link' => route('orders.index')
+        ]);
+
 //        return response()->json(['message' => 'Đơn hàng đã được tạo thành công!', 'order_id' => $order->id], 200);
     }
 
@@ -72,7 +150,9 @@ class OrderController extends Controller
                 $productVariant = $cartItem->productVariant;
                 $itemTotal = $cartItem->quantity * $productVariant->price;
 
-                $order->addItem($cartItem->product_variant_id, $cartItem->quantity, $itemTotal);
+                if (!empty($order)) {
+                    $order->addItem($cartItem->product_variant_id, $cartItem->quantity, $itemTotal);
+                }
                 $totalAmount += $itemTotal;
             }
         }
@@ -80,7 +160,7 @@ class OrderController extends Controller
         return $totalAmount;
     }
 
-    public function paymentMomo($order)
+    public function paymentMomo($order, $cartItemIds)
     {
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
         $partnerCode = 'MOMOBKUN20180529';
@@ -89,9 +169,9 @@ class OrderController extends Controller
         $orderInfo = "Thanh toán qua ATM MoMo";
         $amount = $order->total_amount;
         $orderId = "OK" . $order->id;
-
-        $redirectUrl = route('orders.check_payment', $order->id);
-        $ipnUrl = route('orders.check_payment', $order->id);
+        $cartItemIdsString = implode(',', $cartItemIds);
+        $redirectUrl = route('orders.check_payment', ['order_id' => $order->id, 'cart_item_ids' => $cartItemIdsString]);
+        $ipnUrl = route('orders.check_payment', ['order_id' => $order->id, 'cart_item_ids' => $cartItemIdsString]);
         $extraData = "";
 
         $requestId = time() . "";
@@ -142,10 +222,11 @@ class OrderController extends Controller
         }
     }
 
-    public function paymentVnPay($order)
+    public function paymentVnPay($order, $cartItemIds)
     {
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = route('orders.check_payment', $order->id);
+        $cartItemIdsString = implode(',', $cartItemIds);
+        $vnp_Returnurl = route('orders.check_payment', ['order_id' => $order->id, 'cart_item_ids' => $cartItemIdsString]);
         $vnp_TmnCode = "74YGUA4Z";//Mã website tại VNPAY
         $vnp_HashSecret = "OUXZGKLBCBEYBWAOAPSISCJZSGUBJOLC"; //Chuỗi bí mật
 
@@ -234,12 +315,17 @@ class OrderController extends Controller
     }
 
 
-    public function checkPayment(Request $request, $order_id)
+    public function checkPayment(Request $request)
     {
         $resultCode = $request->input('resultCode');
         $vnp_ResponseCode = $request->input('vnp_ResponseCode');
-        $order = Order::findOrFail($order_id);
-        $carts = Cart::with('cartItems')->where('user_id', $order->user_id)->firstOrFail(); // Ensure we have a cart
+        $order = Order::findOrFail($request->order_id);
+//        dd($request->cart_item_ids);
+        $cartItemIds = explode(',', $request->cart_item_ids);
+        $carts = Cart::with(['cartItems' => function ($query) use ($cartItemIds) {
+            $query->whereIn('id', $cartItemIds);
+        }])->where('user_id', $order->user_id)->firstOrFail();
+
         $user = User::findOrFail($order->user_id); // Ensure we have a valid user
         $paymentStatus = ($resultCode == 0) || ($vnp_ResponseCode == 0) ? Order::PAID : Order::UNPAID;
         $contentAndData = [
@@ -247,13 +333,17 @@ class OrderController extends Controller
             'body' => 'Bạn đã đặt đơn thành công!',
             'listCart' => $carts->cartItems,
             'user' => $user,
+            'order' => $order,
             'payment_status' => ($paymentStatus == Order::PAID) ? "Đã thanh toán" : "Chưa thanh toán",
         ];
         $order->payment_status = $paymentStatus;
         $order->save();
         Mail::to($user->email)->send(new PayTheBillMail($contentAndData));
+
         foreach ($carts->cartItems as $cartItem) {
-            $cartItem->delete();
+            if (in_array($cartItem->id, $cartItemIds)) {
+                $cartItem->delete();
+            }
         }
         return response()->json([
             'result' => true,
@@ -283,7 +373,18 @@ class OrderController extends Controller
 
     }
 
+    public function updateCart(Request $request)
+    {
+        $user = auth()->user();
+        $cartItemsData = $request->input('cart_items');
+        $cartItemIdsToDelete = $request->input('cart_item_ids_to_delete', []);
+        $updatedItems = $this->cart->updateCart($user->id, $cartItemsData, $cartItemIdsToDelete);
 
+        return response()->json([
+            'message' => 'Giỏ hàng đã được cập nhật!',
+            'updated_items' => $updatedItems,
+        ], 200);
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -291,5 +392,33 @@ class OrderController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function getProvinces()
+    {
+        $provinces = Province::all();
+        return response()->json([
+            'result' => true,
+            'data' => $provinces,
+        ], 200);
+    }
+
+    // Lấy danh sách huyện theo tỉnh
+    public function getDistricts($provinceId)
+    {
+        $districts = District::query()->where('province_id', $provinceId)->get();
+        return response()->json([
+            'result' => true,
+            'data' => $districts,
+        ], 200);
+    }
+
+    public function getWards($districtId)
+    {
+        $wards = Ward::query()->where('district_id', $districtId)->get();
+        return response()->json([
+            'result' => true,
+            'data' => $wards,
+        ], 200);
     }
 }

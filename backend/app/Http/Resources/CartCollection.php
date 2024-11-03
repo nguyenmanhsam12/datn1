@@ -23,9 +23,6 @@ class CartCollection extends ResourceCollection
                         return [
                             'id' => $cartItem->id,
                             'product_variant_id' => $cartItem->product_variant_id,
-                            'product_variant' => $cartItem?->productVariant,
-                            'product' => $cartItem?->productVariant?->product,
-                            'size' => $cartItem?->productVariant?->size,
                             'quantity' => $cartItem->quantity,
                             'price' =>$cartItem?->productVariant?->price,
                         ];
