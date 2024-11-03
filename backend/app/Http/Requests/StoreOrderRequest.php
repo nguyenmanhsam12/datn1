@@ -26,7 +26,9 @@ class StoreOrderRequest extends FormRequest
         return [
             'payment_method' => 'required',
             'address_order' => 'required',
-            'city' => 'required',
+            'province_id' => 'required',
+            'ward_id' => 'required',
+            'district_id' => 'required',
             'cart_item_ids' => 'required|array',
             'cart_item_ids.*' => 'exists:cart_items,id',
             'name' => 'nullable|string|min:3', // Tên không bắt buộc, nhưng nếu có thì phải là chuỗi và ít nhất 3 ký tự
@@ -40,7 +42,9 @@ class StoreOrderRequest extends FormRequest
         return [
             'payment_method.required' => 'Phương thức thanh toán là bắt buộc.',
             'address_order.required' => 'Địa chỉ giao hàng là bắt buộc.',
-            'city.required' => 'Thành phố là bắt buộc.',
+            'province_id.required' => 'Thành phố là bắt buộc.',
+            'ward_id.required' => 'Xã là bắt buộc.',
+            'district_id.required' => 'Huyện là bắt buộc.',
             'cart_item_ids.array' => 'Trường ID mặt hàng trong giỏ hàng phải là một mảng.',
             'cart_item_ids.*.exists' => 'Một hoặc nhiều sản phẩm trong giỏ hàng không tồn tại.',
             'name.min' => 'Tên phải có ít nhất 3 ký tự.',

@@ -37,7 +37,6 @@ class Cart extends Model
             ->where('product_variant_id', $productVariantId->id)
             ->first();
 
-
         if ($cartItem) {
             $cartItem->quantity += $quantity;
             $cartItem->save();
@@ -47,9 +46,7 @@ class Cart extends Model
                 'product_variant_id' => $productVariantId->id,
                 'quantity' => $quantity,
                 'price' => $productVariantId->price,
-                
             ]);
-            
         }
 
 

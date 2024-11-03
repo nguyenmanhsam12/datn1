@@ -200,5 +200,10 @@ Route::prefix('orders')->group(function () {
     Route::post('/store', [OrderController::class, 'store'])->middleware('auth:sanctum');
 });
 
+Route::get('provinces', [OrderController::class, 'getProvinces']); 
+Route::get('districts/{id}', [OrderController::class, 'getDistricts']);  
+Route::get('wards/{id}', [OrderController::class, 'getWards']);
+
+
 
 
