@@ -24,6 +24,9 @@ import Auth from './pages/client/Authentication/_Auth'
 import SingGle from './pages/client/SingleProduct/_singleProduct'
 import Cart from './pages/client/Cart/cart'
 import CheckoutForm from './pages/client/Checkout/Checkout'
+import Products from './pages/client/Products/Products'
+import News from './pages/client/News/news'
+import SingleNews from './pages/client/News/SingleNews/SingleNew'
 
 
 const Routes = () => {
@@ -32,6 +35,9 @@ const Routes = () => {
         {path:'',element:<ClientLayout/>,children:[
             {path:'',element:<Home/>},
             {path:'/product/:slug',element:<SingGle/>},
+            {path:'/products/',element:<Products/>},
+            {path:'/news/',element:<News/>},
+            {path:'/news/:id',element:<SingleNews/>},
             {path:'auth/*',element:<Auth/>},
             {path:'cart/',element:<Cart/>},
             {path:'checkout/',element:<CheckoutForm/>},
