@@ -41,6 +41,7 @@ const CheckoutForm = () => {
         province_id: parseInt(formData.city, 10) || 0, 
         district_id: parseInt(formData.district, 10) || 0, 
         ward_id: parseInt(formData.ward, 10) || 0, 
+        note: formData.note || '',
     };
 
     console.log('Order Data:', orderData);

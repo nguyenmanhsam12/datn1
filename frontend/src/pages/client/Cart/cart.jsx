@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Cart = () => {
   const { cartItems, updateCartItemQuantity, removeCartItem, clearCart } = useCart();
   const [message, setMessage] = useState('');
@@ -10,23 +11,34 @@ const Cart = () => {
   const increaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item) {
-      const newQuantity = item.quantity + 1;
-      await updateCartItemQuantity(productVariantId, newQuantity); 
+        const newQuantity = item.quantity + 1;
+        await updateCartItemQuantity(productVariantId, newQuantity, item); // Truyền item vào
+    } else {
+        console.error(`Item with productVariantId ${productVariantId} not found`);
     }
-  };
+};
 
-  const decreaseQuantity = async (productVariantId) => {
+const decreaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item && item.quantity > 1) {
-      const newQuantity = item.quantity - 1;
-      await updateCartItemQuantity(productVariantId, newQuantity); 
+        const newQuantity = item.quantity - 1;
+        await updateCartItemQuantity(productVariantId, newQuantity, item); // Truyền item vào
+    } else if (!item) {
+        console.error(`Item with productVariantId ${productVariantId} not found`);
     }
-  };
+};
+
 
   const handleRemoveItem = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item) {
-      await removeCartItem(item.id); 
+      const isConfirmed = window.confirm("Are you sure you want to remove this item?");
+      
+      if (isConfirmed) {
+        await removeCartItem(item.id); 
+        toast.success("Item removed successfully!");
+        
+      }
     }
   };
 
@@ -37,10 +49,10 @@ const Cart = () => {
   const totalPrice = cartItems.reduce(
     (total, item) => total + ((item.price || 0) * (item.quantity || 0)),
     0
-  );
-
+  ); 
   return (
     <div className="container my-5">
+      <ToastContainer />
       <main className="main-container no-sidebar">
         <div className="container bg-white rounded shadow-lg p-4">
           <div className="breadcrumb-trail mb-4">

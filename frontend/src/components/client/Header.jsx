@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useCart } from "../../context/CartContext";
 import CartItem from "../../pages/client/Cart/CartItem";
@@ -7,9 +7,9 @@ const Header = () => {
 
   const handleQuantityChange = (productVariantId, newQuantity) => {
     updateQuantity(productVariantId, newQuantity);
-  };
+  }; 
 
-  
+  // console.log('cart header',cartItems);
 
   return (
     <header>
@@ -178,11 +178,11 @@ const Header = () => {
               <p>Giỏ hàng</p>
             ) : (
               cartItems.map((item, index) => (
-                <CartItem
+                <CartItem   
                   key={`${item.product_variant_id}-${index}`}
                   item={item}
                   onQuantityChange={handleQuantityChange} 
-                />
+                /> 
               ))
               
             )}

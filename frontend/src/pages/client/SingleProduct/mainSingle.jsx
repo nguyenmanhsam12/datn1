@@ -165,7 +165,7 @@ const MainSingle = () => {
                                         <a href="#" title="Compare"><i className="zmdi zmdi-refresh" /></a>
                                         <a href="#" title="Add To Cart" onClick={(e) => {
                                                 e.preventDefault(); 
-                                                handleAddToCart();
+                                                handleAddToCart();//day o oi
                                             }}>
                                             <i className="zmdi zmdi-shopping-cart-plus" />
                                         </a>
