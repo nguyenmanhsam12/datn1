@@ -1,6 +1,16 @@
 import React from "react";
-
+import { Link } from 'react-router-dom';
+import { useCart } from "../../context/CartContext";
+import CartItem from "../../pages/client/Cart/CartItem";
 const Header = () => {
+  const { cartItems, updateQuantity } = useCart(); 
+
+  const handleQuantityChange = (productVariantId, newQuantity) => {
+    updateQuantity(productVariantId, newQuantity);
+  };
+
+  
+
   return (
     <header>
       {/* Header Top start */}
@@ -157,83 +167,38 @@ const Header = () => {
               {/* Menu Area */}
               {/* Menu Cart Area Start */}
               <div className="mini-cart text-right">
-                <ul>
-                  <li>
-                    <a className="cart-icon" href="#">
-                      <i className="zmdi zmdi-shopping-cart" />
-                      <span>3</span>
-                    </a>
-                    <div className="mini-cart-brief text-left">
-                      <div className="cart-items">
-                        <p className="mb-0">
-                          You have <span>03 items</span> in your shopping bag
-                        </p>
-                      </div>
-                      <div className="all-cart-product clearfix">
-                        <div className="single-cart clearfix">
-                          <div className="cart-photo">
-                            <a href="#">
-                              <img src="client_css/img/cart/1.webp" alt />
-                            </a>
-                          </div>
-                          <div className="cart-info">
-                            <h5>
-                              <a href="#">dummy product name</a>
-                            </h5>
-                            <p className="mb-0">Price : $ 100.00</p>
-                            <p className="mb-0">Qty : 02 </p>
-                            <span className="cart-delete">
-                              <a href="#">
-                                <i className="zmdi zmdi-close" />
-                              </a>
-                            </span>
-                          </div>
-                        </div>
-                        <div className="single-cart clearfix">
-                          <div className="cart-photo">
-                            <a href="#">
-                              <img src="client_css/img/cart/2.webp" alt />
-                            </a>
-                          </div>
-                          <div className="cart-info">
-                            <h5>
-                              <a href="#">dummy product name</a>
-                            </h5>
-                            <p className="mb-0">Price : $ 300.00</p>
-                            <p className="mb-0">Qty : 01 </p>
-                            <span className="cart-delete">
-                              <a href="#">
-                                <i className="zmdi zmdi-close" />
-                              </a>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="cart-totals">
-                        <h5 className="mb-0">
-                          Total <span className="floatright">$500.00</span>
-                        </h5>
-                      </div>
-                      <div className="cart-bottom  clearfix">
-                        <a
-                          href="#"
-                          className="button-one floatleft text-uppercase"
-                          data-text="View cart"
-                        >
-                          View cart
-                        </a>
-                        <a
-                          href="#"
-                          className="button-one floatright text-uppercase"
-                          data-text="Check out"
-                        >
-                          Check out
-                        </a>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+      <ul>
+        <li>
+          <a className="cart-icon" href="#">
+            <i className="zmdi zmdi-shopping-cart" />
+            <span>{cartItems.length}</span> 
+          </a>
+          <div className="mini-cart-brief text-left">
+            {cartItems.length === 0 ? (
+              <p>Giỏ hàng</p>
+            ) : (
+              cartItems.map((item, index) => (
+                <CartItem
+                  key={`${item.product_variant_id}-${index}`}
+                  item={item}
+                  onQuantityChange={handleQuantityChange} 
+                />
+              ))
+              
+            )}
+            <div className="cart-bottom clearfix">
+              <Link
+                to="/cart"
+                className="btn btn-primary text-uppercase float-left"
+                data-text="View cart"
+              >
+                View cart
+              </Link>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
               {/* Menu Cart Area Start */}
             </div>
             {/* mainmenu area end */}
