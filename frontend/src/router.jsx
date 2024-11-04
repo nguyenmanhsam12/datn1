@@ -22,7 +22,8 @@ import EditVariant from './pages/admin/Variant/edit-variant'
 import Home from './pages/client/Home/_Home'
 import Auth from './pages/client/Authentication/_Auth'
 import SingGle from './pages/client/SingleProduct/_singleProduct'
-
+import Cart from './pages/client/Cart/cart'
+import CheckoutForm from './pages/client/Checkout/Checkout'
 
 
 const Routes = () => {
@@ -32,6 +33,8 @@ const Routes = () => {
             {path:'',element:<Home/>},
             {path:'/product/:slug',element:<SingGle/>},
             {path:'auth/*',element:<Auth/>},
+            {path:'cart/',element:<Cart/>},
+            {path:'checkout/',element:<CheckoutForm/>},
             
         ]},
         //admin
