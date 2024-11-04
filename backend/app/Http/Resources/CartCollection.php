@@ -25,6 +25,9 @@ class CartCollection extends ResourceCollection
                             'product_variant_id' => $cartItem->product_variant_id,
                             'quantity' => $cartItem->quantity,
                             'price' =>$cartItem?->productVariant?->price,
+                            'product_variant' => $cartItem?->productVariant,
+                            'product' => $cartItem?->productVariant?->product,
+                            'size' => $cartItem?->productVariant?->size,
                         ];
                     }),
                     'created_at' => $cart->created_at,
