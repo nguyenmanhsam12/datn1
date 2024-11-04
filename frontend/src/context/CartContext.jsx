@@ -43,43 +43,50 @@ export const CartProvider = ({ children }) => {
     
         if (existingItemIndex !== -1) {
             const updatedItems = [...cartItems];
-            const newQuantity = updatedItems[existingItemIndex].quantity + item.quantity; 
-            updatedItems[existingItemIndex].quantity = newQuantity; 
-            setCartItems(updatedItems); 
+            const newQuantity = updatedItems[existingItemIndex].quantity + item.quantity;
+            updatedItems[existingItemIndex].quantity = newQuantity;
+            setCartItems(updatedItems);
     
             if (newQuantity > 0) {
                 await updateCartItemQuantity(
                     updatedItems[existingItemIndex].product_variant_id,
-                    newQuantity
-                ); 
+                    newQuantity,
+                    updatedItems[existingItemIndex]
+                );
             }
         } else {
             const payload = {
                 product_variant_id: item.product_variant_id,
-                quantity: item.quantity || 1, 
+                quantity: item.quantity || 1,
             };
-    
+            console.log('Payload gửi đến backend:', payload);
             try {
                 const response = await api.post('/carts', payload, {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
                     },
                 });
-    
+                console.log('Response từ backend:', response.data); // Kiểm tra phản hồi
                 if (response.data.status === 'success') {
                     const newCartItem = response.data.data.cart_item;
-                    setCartItems(prevItems => [...prevItems, newCartItem]); 
+                    console.log('New cart item:', newCartItem); // Kiểm tra để đảm bảo id được trả về
+                    if (newCartItem && newCartItem.id) { // Thay cart_item_id bằng id
+                        setCartItems(prevItems => [...prevItems, newCartItem]);
+                    } else {
+                        console.error("No cart item ID returned from backend:", response.data);
+                    }
                 }
             } catch (error) {
-                console.error(
-                    'Error adding item to cart:',
-                    error.response ? error.response.data : error.message
-                );
+                console.error('Error adding item to cart:', error.response ? error.response.data : error.message);
             }
+            
+            
         }
     };
     
-    const updateCartItemQuantity = async (productVariantId, newQuantity) => {
+    
+    const updateCartItemQuantity = async (productVariantId, newQuantity, existingItem) => {
         const token = sessionStorage.getItem('token');
         if (!token) {
             console.error('User is not authenticated');
@@ -91,26 +98,26 @@ export const CartProvider = ({ children }) => {
             return;
         }
     
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.product_variant_id === productVariantId ? { ...item, quantity: newQuantity } : item
-            )
-        );
+        const payload = {
+            cart_items: [{
+                cart_item_id: existingItem.id, 
+                quantity: newQuantity,
+                product_variant_id: productVariantId,
+            }],
+        };
+        
+        console.log('Payload cập nhật giỏ hàng:', payload);
     
         try {
-            const response = await api.put('/cart/update-cart', {
-                cart_items: [{
-                     cart_item_id: productVariantId,
-                     quantity: newQuantity,
-                      }],
-            }, {
+            const response = await api.put('/cart/update-cart', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                }
+                    'Content-Type': 'application/json',
+                },
             });
     
             if (response.data.status === 'success') {
-                console.log(`Successfully updated quantity for item ${productVariantId} to ${newQuantity}`);
+                console.log(`Successfully updated quantity for item ${existingItem.product_variant_id} to ${newQuantity}`);
             } else {
                 console.error('Failed to update cart item quantity:', response.data);
             }
@@ -118,9 +125,6 @@ export const CartProvider = ({ children }) => {
             console.error('Error updating cart item quantity:', error.response ? error.response.data : error.message);
         }
     };
-    
-    
-
     const removeCartItem = async (id) => {
         try {
             // Lấy danh sách sản phẩm trong giỏ hàng

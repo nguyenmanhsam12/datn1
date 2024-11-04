@@ -25,9 +25,10 @@ const MainSingle = () => {
                 setGallary(resdata.data.data.product.gallary);
                 setVariant(resdata.data.data.product.variants);
                 
-                
                 // Không tự động chọn variant hay thêm vào giỏ hàng
                 if (resdata.data.data.product.variants.length > 0) {
+                // setSelectedVariant(resdata.data.data.product.variants[0]);
+
                     // Bạn có thể đặt selectedVariant là null hoặc một giá trị khác không phải là biến thể.
                     setSelectedVariant(null); // Đặt nó là null để không có gì được chọn
                     setQuantity(1); // Đặt số lượng mặc định là 1
@@ -47,35 +48,49 @@ const MainSingle = () => {
     
     const [isAdding, setIsAdding] = useState(false); 
 
-const handleAddToCart = async () => {
-    if (isAdding) return; 
-    setIsAdding(true); 
-
-    if (!selectedVariant) {
-        toast.warning("Please select a variant before adding to cart.");
-        setIsAdding(false); 
-        return;
-    }
-
-    if (quantity <= 0) {
-        toast.warning("Quantity must be greater than 0.");
-        setIsAdding(false); 
-        return;
-    }
-
-    try {
-        await addToCart({
-            product_variant_id: selectedVariant.id,
-            quantity: quantity,
-        });
-        toast.success("Product added to cart successfully!");
-        setQuantity(1); 
-    } catch (error) {
-        toast.error("Failed to add product to cart.");
-    } finally {
-        setIsAdding(false); 
-    }
-};
+    const handleAddToCart = async () => {
+        if (isAdding) return; 
+        setIsAdding(true); 
+    
+        const token = sessionStorage.getItem("token"); 
+        if (!token) {
+            toast.warning("Please log in to add products to the cart.");
+            setIsAdding(false);
+            return;
+        }
+    
+        if (!selectedVariant) {
+            toast.warning("Please select a variant before adding to cart.");
+            setIsAdding(false); 
+            return;
+        }
+    
+        if (quantity <= 0) {
+            toast.warning("Quantity must be greater than 0.");
+            setIsAdding(false); 
+            return;
+        }
+    
+        try {
+            await addToCart({
+                product_variant_id: selectedVariant.id,
+                quantity: quantity,
+            });
+            toast.success("Product added to cart successfully!");
+            setQuantity(1); 
+        } catch (error) {
+            console.error('Caught error:', error); // In chi tiết lỗi
+            if (error.response) {
+                console.error('Server responded with:', error.response.data); // Xem phản hồi từ server
+            } else {
+                console.error('Error message:', error.message); // Xem thông báo lỗi
+            }
+            toast.error("Failed to add product to cart.");
+        }finally {
+            setIsAdding(false); 
+        }
+    };
+    
     return (
         <div className="product-area single-pro-area pt-80 pb-80 product-style-2">
             <div className="container">

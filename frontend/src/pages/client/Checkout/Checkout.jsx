@@ -12,7 +12,7 @@ const CheckoutForm = () => {
     city: '',
     district: '',
     ward: '', 
-    notes: '',
+    note: '',
     paymentMethod: '',
     voucher: '', 
     district: '',
@@ -280,10 +280,10 @@ useEffect(() => {
                 <div className="mb-3">
                   <label className="form-label">Ghi chú (nếu có)</label>
                   <textarea
-                    name="notes"
+                    name="note"
                     className="form-control"
                     placeholder="Ghi chú"
-                    value={formData.notes}
+                    value={formData.note}
                     onChange={handleChange}
                   />
                 </div>
