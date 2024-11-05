@@ -9,6 +9,8 @@ export const useBrands = () => useContext(BrandContext);
 export const BrandProvider = ({ children }) => {
     const [brands, setBrands] = useState([]);
     const location = useLocation();
+    
+    
 
     useEffect(() => {
         const loadBrands = async () => {
@@ -23,6 +25,7 @@ export const BrandProvider = ({ children }) => {
         // Chỉ gọi loadBrands nếu đang ở route /admin
         if (location.pathname.startsWith('/admin')) {
             loadBrands();
+            console.log(brands);
         }
     }, [location.pathname]);
 
