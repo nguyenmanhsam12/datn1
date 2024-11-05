@@ -1,8 +1,8 @@
 import React from 'react';
 
-const CartItem = ({ item, onQuantityChange }) => {
+const CartItem = ({ item}) => { 
     const price = parseFloat(item.price) || 0;
-
+console.log('item', item)
     const baseURL = "http://127.0.0.1:8000"; 
 
     const cartItemStyle = {
@@ -56,7 +56,7 @@ const CartItem = ({ item, onQuantityChange }) => {
                     <div style={cartItemInfoStyle}>
                         <h4 style={cartItemNameStyle}>{item.product ? item?.product?.name : "Product Name"}</h4>
                         <span style={cartItemPriceStyle}>{price.toFixed(2)} VND</span>
-                    </div>
+                    </div> 
                 </div>
             </td>
         </tr>

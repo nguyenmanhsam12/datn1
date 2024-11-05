@@ -12,7 +12,7 @@ const CheckoutForm = () => {
     city: '',
     district: '',
     ward: '', 
-    notes: '',
+    note: '',
     paymentMethod: '',
     voucher: '', 
     district: '',
@@ -41,6 +41,7 @@ const CheckoutForm = () => {
         province_id: parseInt(formData.city, 10) || 0, 
         district_id: parseInt(formData.district, 10) || 0, 
         ward_id: parseInt(formData.ward, 10) || 0, 
+        note: formData.note || '',
     };
 
     console.log('Order Data:', orderData);
@@ -280,10 +281,10 @@ useEffect(() => {
                 <div className="mb-3">
                   <label className="form-label">Ghi chú (nếu có)</label>
                   <textarea
-                    name="notes"
+                    name="note"
                     className="form-control"
                     placeholder="Ghi chú"
-                    value={formData.notes}
+                    value={formData.note}
                     onChange={handleChange}
                   />
                 </div>

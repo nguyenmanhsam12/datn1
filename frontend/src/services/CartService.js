@@ -25,7 +25,7 @@ const CartService = {
             throw new Error('No authentication token found');
         }
     
-        const data = {
+        const data = { 
             cart_items: cartItemsData,
             cart_item_ids_to_delete: cartItemIdsToDelete,
         };
@@ -36,14 +36,14 @@ const CartService = {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-    
-            if (response.data.status === 'success') {
-                console.log('Cart updated successfully:', response.data);
-                return response.data;
-            } else {
-                console.error('Failed to update cart:', response.data);
-                throw new Error('Failed to update cart');
-            }
+            console.log('response',response)
+            // if (response.data.status === 'success') { // co can bo cai status kh oo nhi
+            //     console.log('Cart updated successfully:', response.data);
+            //     return response.data;
+            // } else {
+            //     console.error('Failed to update cart:', response.data);
+            //     throw new Error('Failed to update cart');
+            // }
         } catch (error) {
             console.error('Error updating cart:', error);
             throw error;
