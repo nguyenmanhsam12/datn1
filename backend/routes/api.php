@@ -203,6 +203,7 @@ Route::prefix('orders')->group(function () {
 Route::get('provinces', [OrderController::class, 'getProvinces']); 
 Route::get('districts/{id}', [OrderController::class, 'getDistricts']);  
 Route::get('wards/{id}', [OrderController::class, 'getWards']);
+Route::get('discount-amount', [OrderController::class, 'discountAmount'])->middleware('auth:sanctum');
 
 
 
