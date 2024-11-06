@@ -137,6 +137,10 @@ class Cart extends Model
 
     //     return $updatedCartItems;
     // }
+
+
+
+    
     public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)
 {
     \Log::info('Received cart items data:', $cartItemsData);
