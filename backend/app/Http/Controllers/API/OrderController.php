@@ -421,4 +421,58 @@ class OrderController extends Controller
             'data' => $wards,
         ], 200);
     }
+    public function discountAmount(Request $request)
+    {
+        $user = auth()->user();
+        $code = $request->input('code');
+        $cartItemIds = $request->cart_item_ids;
+        $carts = Cart::with('cartItems')->where('user_id', $user->id)->first();
+        $discountAmount = 0;
+        if (!empty($code)) {
+            $voucher = Voucher::query()->where('code', $code)->first();
+
+            if (!$voucher) {
+                return response()->json(['result' => false, 'error' => 'Mã giảm giá không tồn tại'], 404);
+            }
+
+            if ($voucher->usage_limit <= 0) {
+                return response()->json(['result' => false, 'error' => 'Mã giảm giá đã hết lượt sử dụng'], 400);
+            }
+//
+            $userVoucherUsage = Order::where('user_id', $user->id)
+                ->where('voucher_id', $voucher->id)
+                ->count();
+
+            if ($userVoucherUsage > 0) {
+                return response()->json(['result' => false, 'error' => 'Bạn đã sử dụng mã giảm giá này'], 400);
+            }
+
+            $currentDate = now();
+            if ($currentDate < $voucher->start_date || $currentDate > $voucher->expiry_date) {
+                return response()->json(['result' => false, 'error' => 'Mã giảm giá đã hết hạn hoặc chưa đến thời gian áp dụng'], 400);
+            }
+
+            $total = $this->processCartItems($carts, null, $cartItemIds);
+
+            if ($total < $voucher->min_order_value) {
+                return response()->json(['result' => false, 'error' => 'Giá trị đơn hàng không đủ để áp dụng mã giảm giá'], 400);
+            }
+
+            if ($voucher->discount_type === 'fixed') {
+                $discountAmount = (float)$voucher->discount_value;
+            } elseif ($voucher->discount_type === 'percentage') {
+                $discountAmount = $total * ((float)$voucher->discount_value / 100);
+
+                if ($voucher->max_discount_value !== null) {
+                    $discountAmount = min($discountAmount, (float)$voucher->max_discount_value);
+                }
+            }
+
+        }
+        return response()->json([
+            'result' => true,
+            'discount_amount' => $discountAmount,
+        ], 200);
+    }
 }
+
