@@ -32,13 +32,38 @@ class Cart extends Model
 
     public static function addOrUpdateCartItem($userId, $productVariantId, $quantity)
     {
+        $productVariant = ProductVariant::query()->find($productVariantId)->first();
+
+        if (!$productVariant) {
+            return response()->json([
+                'message' => 'Không tìm thấy sản phẩm variant với ID: ' . $productVariantId,
+                'result' => false,
+            ], 404);
+        }
+
+        if ($productVariant->stock < $quantity) {
+            return response()->json([
+                'message' => 'Tồn kho không đủ để thêm sản phẩm vào giỏ hàng.',
+                'result' => false,
+            ], 400);
+        }
+
         $cart = self::firstOrCreate(['user_id' => $userId]);
         $cartItem = CartItem::where('cart_id', $cart->id)
             ->where('product_variant_id', $productVariantId->id)
             ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += $quantity;
+            $newQuantity = $cartItem->quantity + $quantity;
+
+            if ($productVariant->stock < $newQuantity) {
+                return response()->json([
+                    'message' => 'Tồn kho không đủ để thêm sản phẩm với số lượng yêu cầu.',
+                    'result' => false,
+                ], 400);
+            }
+
+            $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
             $cartItem = CartItem::create([
@@ -51,6 +76,30 @@ class Cart extends Model
 
 
         return $cartItem;
+    }
+  public static function deleteCart($userId, $cartItemIdsToDelete)
+    {
+        try {
+            $checkAll = is_array($cartItemIdsToDelete) && in_array("all", $cartItemIdsToDelete);
+
+            if (!empty($cartItemIdsToDelete)) {
+                if ($checkAll) {
+                    Cart::query()->where('user_id', $userId)->delete();
+                    return true;
+                }
+
+                CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi xóa các mục trong giỏ hàng: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'cart_item_ids_to_delete' => $cartItemIdsToDelete,
+            ]);
+
+            return false;
+        }
     }
 
     public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)

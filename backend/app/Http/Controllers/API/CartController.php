@@ -101,8 +101,14 @@ class CartController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $user = auth()->user();
+        $cartItemIdsToDelete = $request->input('cart_item_ids_to_delete', []);
+        $deleteItems = $this->cart->deleteCart($user->id, $cartItemIdsToDelete);
+        return response()->json([
+            'message' => 'Giỏ hàng đã được cập nhật!',
+            'result' => $deleteItems,
+        ], 200);
     }
 }
