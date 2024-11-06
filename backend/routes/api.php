@@ -205,6 +205,7 @@ Route::get('districts/{id}', [OrderController::class, 'getDistricts']);
 Route::get('wards/{id}', [OrderController::class, 'getWards']);
 Route::get('discount-amount', [OrderController::class, 'discountAmount'])->middleware('auth:sanctum');
 
+Route::post('/cart/delete-cart', [CartController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 

@@ -50,12 +50,35 @@ class Order extends Model
 
     public function addItem($productVariantId, $quantity, $price)
     {
-        OrderItem::create([
+        $orderItem = OrderItem::create([
             'order_id' => $this->id,
             'product_variant_id' => $productVariantId,
             'quantity' => $quantity,
             'price' => $price,
         ]);
+
+        $productVariant = ProductVariant::find($productVariantId);
+
+        if ($productVariant) {
+            if ($productVariant->stock >= $quantity) {
+                $productVariant->stock -= $quantity;
+                $productVariant->save();
+            } else {
+                $orderItem->delete();
+                $this->delete();
+                OrderAddresses::where('order_id', $this->id)->delete();
+                return response()->json([
+                    'message' => 'Tồn kho không đủ để thêm sản phẩm vào đơn hàng, đơn hàng đã bị hủy.',
+                    'result' => false,
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'message' => "Không tìm thấy sản phẩm variant với ID: $productVariantId",
+                'result' => false,
+            ], 500);
+        }
+
     }
 
     public function updateTotalAmount($totalAmount, $discountAmount)
