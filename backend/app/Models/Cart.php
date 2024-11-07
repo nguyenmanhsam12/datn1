@@ -126,7 +126,7 @@ class Cart extends Model
                     if ($cartItem) {
                      
                         if($value> $productVariant->stock){
-                           throw new \Exception("Không đủ tồn kho thêm cái cứt ý!.");
+                           throw new \Exception("Không đủ tồn kho ko thêm đc.");
                         }
                         $cartItem->quantity = $itemData['quantity'];
 
