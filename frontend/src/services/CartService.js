@@ -49,6 +49,28 @@ const CartService = {
             throw error;
         }
     },
+    deleteCartItems: async (cartItemIds) => {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+    
+        const data = { cart_item_ids_to_delete: cartItemIds };
+    
+        try {
+            const response = await api.post('/cart/delete-cart', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            console.log('Deleted cart items response:', response.data); // Log the response
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting cart items:', error);
+            throw error;
+        }
+    }
+    
 }    
 
 export default CartService;
