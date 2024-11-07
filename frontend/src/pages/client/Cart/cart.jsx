@@ -63,20 +63,12 @@ const Cart = () => {
   const increaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item) {
-        const availableStock = item?.product?.stock || 0;  
         const newQuantity = item.quantity + 1;
-        
-        if (newQuantity > availableStock) {
-            toast.error(`Cannot increase quantity. Only ${availableStock} items are available.`);
-            return;
-        }
-
-        await updateCartItemQuantity(productVariantId, newQuantity, item); 
+        await updateCartItemQuantity(productVariantId, newQuantity, item); // Truyền item vào
     } else {
         console.error(`Item with productVariantId ${productVariantId} not found`);
     }
 };
-
   const decreaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item && item.quantity > 1) {
@@ -102,7 +94,8 @@ const Cart = () => {
         }
       }
 
-      setCartItems([]); 
+      const updatedCartItems = cartItems.filter(item => !selectedItems.has(item.product_variant_id));
+    setCartItems(updatedCartItems); 
       setSelectedItems(new Set()); 
       toast.success("All selected items have been removed from the cart.");
     }
