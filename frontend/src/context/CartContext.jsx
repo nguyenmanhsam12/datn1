@@ -108,10 +108,7 @@ export const CartProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                 },
             });
-            if (response.status === 400 && response.data.result === false) {
-                toast.error(response.data.message || 'Failed to add item to cart.');
-                return;
-            }
+           
 
             if (response.data.updated_items && response.data.updated_items.length > 0) {
                 const updatedItems = response.data.updated_items;

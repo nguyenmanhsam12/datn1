@@ -1,10 +1,23 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
-const MenuProducts = ({ size, onChangeSize }) => {
+const MenuProducts = ({ size, onChangeSize ,productsCate}) => {
   const sizes = [38,39,40,41,42]
-
-
+   const [category, setCategory] = useState([]);
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const res = await axios.get(`http://127.0.0.1:8000/api/AllCategory`);
+        console.log("listCategory", res);
+        setCategory(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCategory();
+  }, []);
+  
   return (
     <div className="product-area pt-20 pb-20 product-style-2">
       <div className="container">
@@ -14,6 +27,7 @@ const MenuProducts = ({ size, onChangeSize }) => {
             <div className="col-12">
               <div className="product-option d-flex flex-column-reverse flex-md-row justify-content-between align-items-center mb-30">
                 <div className="left d-flex">
+                <a href="" className="option-btn">Products</a>
                   {/* Categories start */}
                   <div className="dropdown">
                     <button className="option-btn">Categories</button>
@@ -27,107 +41,18 @@ const MenuProducts = ({ size, onChangeSize }) => {
                           id="cat-treeview"
                           className="widget-info product-cat boxscrol2"
                         >
-                          <ul>
-                            <li>
-                              <span>Chair</span>
-                              <ul>
-                                <li>
-                                  <a href="#">T-Shirts</a>
+                          <ul className="list-group">
+                            {category.map((cate, index) => (
+                              <button className={`list-group ${index === 0 ? 'active' : ''}`} key={cate.name}>
+                                <li
+                                  className={`list-group ${index === 0 ? 'active' : ''}`}
+                                  data-bs-toggle="tab"
+                                  onClick={() => productsCate(cate.slug)}
+                                >
+                                  {cate.name}
                                 </li>
-                                <li>
-                                  <a href="#">Striped Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Half Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Formal Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Bilazers</a>
-                                </li>
-                              </ul>
-                            </li>
-                            <li className="open">
-                              <span>Bag</span>
-                              <ul>
-                                <li>
-                                  <a href="#">Men Bag</a>
-                                </li>
-                                <li>
-                                  <a href="#">Shoes</a>
-                                </li>
-                                <li>
-                                  <a href="#">Watch</a>
-                                </li>
-                                <li>
-                                  <a href="#">T-shirt</a>
-                                </li>
-                                <li>
-                                  <a href="#">Shirt</a>
-                                </li>
-                              </ul>
-                            </li>
-                            <li>
-                              <span>Accessories</span>
-                              <ul>
-                                <li>
-                                  <a href="#">T-Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Striped Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Half Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Formal Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Bilazers</a>
-                                </li>
-                              </ul>
-                            </li>
-                            <li>
-                              <span>Top Brands</span>
-                              <ul>
-                                <li>
-                                  <a href="#">T-Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Striped Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Half Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Formal Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Bilazers</a>
-                                </li>
-                              </ul>
-                            </li>
-                            <li>
-                              <span>Jewelry</span>
-                              <ul>
-                                <li>
-                                  <a href="#">T-Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Striped Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Half Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Formal Shirts</a>
-                                </li>
-                                <li>
-                                  <a href="#">Bilazers</a>
-                                </li>
-                              </ul>
-                            </li>
+                              </button>
+                            ))}
                           </ul>
                         </div>
                       </aside>
@@ -150,8 +75,8 @@ const MenuProducts = ({ size, onChangeSize }) => {
                         >
                           <ul>
                             <li>
-                              <span onClick={() => navigate('/content/nike')}>Nike</span>
-                              <span onClick={() => navigate('/content/nike')}>Adidas</span>
+                              <span onClick={() => setBrand('nike')}>Nike</span>
+                              <span onClick={() => setBrand('adidas')}>Adidas</span>
                             </li>
                            </ul>
                         </div>
@@ -187,9 +112,6 @@ const MenuProducts = ({ size, onChangeSize }) => {
                       {/* Widget-Size end */}
                     </div>
                   </div>
-                </div>
-                <div className="right">
-                  {/* Size end */}
                 </div>
               </div>
             </div>
