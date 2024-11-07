@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useCart } from '../../../context/CartContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 const CheckoutForm = () => {
-  const { cartItems,resetCart  } = useCart();
+  const {cartItems, setCartItems  } = useCart();
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -11,120 +12,167 @@ const CheckoutForm = () => {
     address: '',
     city: '',
     district: '',
-    ward: '', 
+    ward: '',
     note: '',
-    paymentMethod: '',
-    voucher: '', 
-    district: '',
+    paymentMethod: '', 
+    voucher: '',
   });
+  const location = useLocation();
+  const { items = [] } = location.state || {};
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState('cod'); 
-  const [discountCode, setDiscountCode] = useState('');
   const [message, setMessage] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+
+  if (!items.length) {
+    console.error("Checkout items are undefined!");
+    return <div>No items in cart</div>;
+  }
+  const handleApplyDiscount = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/discount-amount', {
+        params: {
+          code: discountCode, // discount code entered by the user
+          'cart_item_ids[]': items.map(item => item.id), // cart item IDs
+        },
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      });
+  
+      if (response.data.result) {
+        let discountAmount = response.data.discount_amount;
+        console.log('Discount Applied:', discountAmount);
+        setDiscountAmount(discountAmount); // Store the discount amount in state
+        setMessage(`Discount applied: ${discountAmount.toFixed(2)} VND`);
+      } else {
+        setMessage(response.data.error);
+      }
+  
+    } catch (error) {
+      if (error.response) {
+        // console.error('Error applying discount:', error.response.data);
+        setMessage(`Failed to apply discount: ${error.response.data.message || error.response.data.error}`);
+      } else {
+        console.error('Error applying discount:', error);
+        setMessage('Failed to apply discount. Please try again.');
+      }
+    }
+  };
+  
+  
+  
+  // const totalPrice = Array.isArray(items) ? items.reduce((total, item) => {
+  //   return total + (parseFloat(item.price) * item.quantity);
+  // }, 0) : 0;
+    
+  const resetCart = (purchasedItems) => {
+    const remainingItems = cartItems.filter(item =>
+        !purchasedItems.some(purchased => purchased.product_variant_id === item.product_variant_id)
+    );
+    setCartItems(remainingItems);
+    sessionStorage.setItem('cart', JSON.stringify(remainingItems)); // Cập nhật session storage
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-        setMessage('Please fill in all required fields correctly.');
-        return;
+      setMessage('Please fill in all required fields correctly.');
+      return;
     }
 
     const orderData = {
-        cart_item_ids: cartItems.map(item => item.id),
-        code: discountCode || '',
-        payment_method: formData.paymentMethod || 'COD', 
-        address_order: formData.address || '',
-        province_id: parseInt(formData.city, 10) || 0, 
-        district_id: parseInt(formData.district, 10) || 0, 
-        ward_id: parseInt(formData.ward, 10) || 0, 
-        note: formData.note || '',
+      cart_item_ids: items.map(item => item.id),
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber,
+      code: discountCode || '',
+      payment_method: formData.paymentMethod || 'COD',
+      address_order: formData.address || '',
+      province_id: parseInt(formData.city, 10) || 0,
+      district_id: parseInt(formData.district, 10) || 0,
+      ward_id: parseInt(formData.ward, 10) || 0,
+      note: formData.note || '',
+      
     };
 
     console.log('Order Data:', orderData);
 
     try {
-        const response = await axios.post('http://127.0.0.1:8000/api/orders/store', orderData, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-            },
-        });
+      const response = await axios.post('http://127.0.0.1:8000/api/orders/store', orderData, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      });
 
-        if (response.data.result) {
-          resetCart();
-            setMessage('Order placed successfully!');
-            navigate('/'); 
-        }
+      if (response.data.result) {
+        // const selectedItem = [];
+        resetCart(items);
+        setMessage('Order placed successfully!');
+        navigate('/');
+      }
     } catch (error) {
-        console.error('Error placing order:', error);
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            const errors = error.response.data.errors; 
-            if (errors) {
-                const errorMessages = Object.values(errors).flat().join(', ');
-                setMessage(`Errors: ${errorMessages}`);
-            } else {
-                setMessage('An error occurred while placing your order.');
-            }
+      console.error('Error placing order:', error);
+      if (error.response) {
+        const errors = error.response.data.errors; 
+        if (errors) {
+          console.log('Response status:', error.response.status);
+        console.log('Response data:', error.response.data);
+          const errorMessages = Object.values(errors).flat().join(', ');
+          setMessage(`Errors: ${errorMessages}`);
         } else {
-            setMessage('An unexpected error occurred. Please try again.');
+          setMessage('An error occurred while placing your order.');
         }
+      } else {
+        setMessage('An unexpected error occurred. Please try again.');
+      }
     }
-};
+  };
 
-
-
-    
-useEffect(() => {
+  useEffect(() => {
     const fetchProvinces = async () => {
-        try {
-            const response = await axios.get('http://127.0.0.1:8000/api/provinces'); 
-            // console.log('API Response:', response); 
-            // console.log('Provinces Data:', response.data.data); 
-            setProvinces(response.data.data);
-        } catch (error) {
-            console.error('Error fetching provinces:', error); 
-        }
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/provinces');
+        setProvinces(response.data.data);
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+      }
     };
 
     fetchProvinces();
-}, []);
-useEffect(() => {
-  // console.log('City ID before fetch:', formData.city); 
-  if (formData.city) {
-    const fetchDistricts = async () => {
-      try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/districts/${formData.city}`);
-        // console.log('API Response:', response.data); // Kiểm tra phản hồi từ API
-        setDistricts(response.data.data); // Lưu trữ dữ liệu quận
-        // console.log('Districts:', response.data.data); // Kiểm tra dữ liệu quận
-      } catch (error) {
-        console.error('Error fetching districts:', error);
-      }
-    };
-    fetchDistricts();
-  }
-}, [formData.city]);
-useEffect(() => {
-  // console.log('District ID before fetch:', formData.district); 
-  if (formData.district) {
+  }, []);
+
+  useEffect(() => {
+    if (formData.city) {
+      const fetchDistricts = async () => {
+        try {
+          const response = await axios.get(`http://127.0.0.1:8000/api/districts/${formData.city}`);
+          setDistricts(response.data.data);
+        } catch (error) {
+          console.error('Error fetching districts:', error);
+        }
+      };
+      fetchDistricts();
+    }
+  }, [formData.city]);
+
+  useEffect(() => {
+    if (formData.district) {
       const fetchWards = async () => {
-          try {
-              const response = await axios.get(`http://127.0.0.1:8000/api/wards/${formData.district}`);
-              // console.log('Fetching wards for district ID:', formData.district); 
-              // console.log('Wards API Response:', response.data); 
-              setWards(response.data.data); // Set wards data
-              // console.log('Wards:', response.data.data); 
-          } catch (error) {
-              console.error('Error fetching wards:', error);
-          }
+        try {
+          const response = await axios.get(`http://127.0.0.1:8000/api/wards/${formData.district}`);
+          setWards(response.data.data);
+        } catch (error) {
+          console.error('Error fetching wards:', error);
+        }
       };
       fetchWards();
-  }
-}, [formData.district]);
+    }
+  }, [formData.district]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,8 +182,8 @@ useEffect(() => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullName) newErrors.fullName = 'Họ và tên là bắt buộc.';
-    if (!formData.phoneNumber) newErrors.phoneNumber = 'Số điện thoại là bắt buộc.';
-    if (!formData.email) newErrors.email = 'Email là bắt buộc.';
+    if (!/^\d{10}$/.test(formData.phoneNumber)) newErrors.phoneNumber = 'Số điện thoại không hợp lệ.';
+    if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email không hợp lệ.';
     if (!formData.address) newErrors.address = 'Địa chỉ cụ thể là bắt buộc.';
     if (!formData.city) newErrors.city = 'Thành phố là bắt buộc.';
     if (!formData.district) newErrors.district = 'Quận/Huyện là bắt buộc.';
@@ -145,15 +193,6 @@ useEffect(() => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  
-
-  // if (cartItems.length === 0) {
-  //   return <div>Loading...</div>;
-  // }
-
-  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
   return (
     <div className="bg-light py-5">
       <div className="container">
@@ -342,29 +381,58 @@ useEffect(() => {
                   value={discountCode}
                   onChange={(e) => setDiscountCode(e.target.value)}
                 />
-                <button className="btn btn-outline-primary mt-2 w-100">Áp dụng mã</button>
+                <button
+                className="btn btn-outline-primary mt-2 w-100"
+                onClick={handleApplyDiscount} // Add onClick handler
+            >
+                Áp dụng mã
+            </button>
+            {message && <small className="text-success d-block mt-2">{message}</small>}
               </div>
-            <div className="bg-white p-4 rounded shadow-sm">
-              <h3 className="h4 mb-3">Tóm Tắt Đơn Hàng</h3>
-              <ul className="list-unstyled">
-                {cartItems.map((item, index) => (
-                  <li key={index} className="d-flex align-items-center justify-content-between mb-3">
-                    <img 
-                      src={`http://127.0.0.1:8000${item?.product?.image}`} 
-                      alt={item?.product?.name} 
-                      className="img-fluid rounded" 
-                      style={{ width: '100px' }} 
-                    />
-                    <span className="ms-3">{item?.product?.name} x {item.quantity}</span>
-                    <span>{(item.price * item.quantity).toFixed(2)} VND</span> 
-                  </li>
-                ))}
-              </ul>
-              <div className="d-flex justify-content-between fw-bold">
-                <span>Tổng cộng:</span>
-                <span>{totalAmount.toFixed(2)} VND</span>
-              </div>
-            </div>
+              <div className="bg-white p-4 rounded shadow-sm">
+  <h3 className="h4 mb-3">Tóm Tắt Đơn Hàng</h3>
+  {items && items.length > 0 ? (
+    <ul className="list-unstyled">
+      {items.map((selectedItem, index) => (
+        <li key={index} className="d-flex align-items-center justify-content-between mb-3">
+          <img 
+            src={`http://127.0.0.1:8000${selectedItem.product.image}`} 
+            alt={selectedItem.product.name} 
+            className="img-fluid rounded" 
+            style={{ width: '100px' }} 
+          />
+          <span className="ms-3">{selectedItem.product.name} x {selectedItem.quantity}</span>
+          <span>{(selectedItem.price * selectedItem.quantity).toFixed(2)} VND</span> 
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No item selected for checkout.</p>
+  )}
+  {/* <div className="d-flex justify-content-between fw-bold">
+    <span>Tổng cộng:</span>
+    <span>
+      {items ? items.reduce((total, selectedItem) => total + (selectedItem.price * selectedItem.quantity), 0).toFixed(2) : 0} VND
+    </span>
+  </div> */}
+
+  {/* Apply discount and show discounted total */}
+  {discountAmount > 0 && (
+    <div className="d-flex justify-content-between fw-bold mt-2">
+      <span>Giảm giá:</span>
+      <span>- {discountAmount.toFixed(2)} VND</span>
+    </div>
+  )}
+
+  <div className="d-flex justify-content-between fw-bold mt-2">
+    <span><strong>Tổng cộng:</strong></span>
+    <span>
+      {items ? 
+        (items.reduce((total, selectedItem) => total + (selectedItem.price * selectedItem.quantity), 0) - discountAmount).toFixed(2) 
+        : 0} VND
+    </span>
+  </div>
+</div>
 
             <div className="d-flex justify-content-end mt-4">
               <button

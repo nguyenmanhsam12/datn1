@@ -62,7 +62,6 @@ class Cart extends Model
                     'result' => false,
                 ], 400);
             }
-
             $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {

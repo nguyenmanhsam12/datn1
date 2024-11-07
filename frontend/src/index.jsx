@@ -7,6 +7,7 @@ import './index.css';
 import App from './App';
 import AppProvider from './context/_AppProvider';
 import { CartProvider } from './context/CartContext'; 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>

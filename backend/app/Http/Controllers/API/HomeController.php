@@ -172,6 +172,18 @@ class HomeController extends Controller
                 ->where('slug', $slug)
                 ->first(); // Sử dụng first() để lấy một sản phẩm
 
+            // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+            if (!$product) {
+                return response()->json([
+                    'message' => 'Không tìm thấy sản phẩm nào.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Tính giá tiền nhỏ nhất và lớn nhất từ các biến thể
+            $prices = $product->variants->pluck('price');
+            $minPrice = $prices->min();
+            $maxPrice = $prices->max();
+
             $productFormatted = (object)[
                 'id' => $product->id,
                 'name' => $product->name,
@@ -179,6 +191,8 @@ class HomeController extends Controller
                 'sku' => $product->sku,
                 'brand' => $product->brand->name,
                 'category' => $product->category->name,
+                'minPrice' => $minPrice,
+                'maxPrice' => $maxPrice,
                 'image' => asset($product->image),
                 'gallary' => collect(json_decode($product->gallary))
                     ->map(function ($image) {
@@ -195,12 +209,7 @@ class HomeController extends Controller
             ];
 
 
-            // Kiểm tra nếu không có sản phẩm nào được tìm thấy
-            if (!$product) {
-                return response()->json([
-                    'message' => 'Không tìm thấy sản phẩm nào.'
-                ], Response::HTTP_NOT_FOUND);
-            }
+            
 
             // Lấy các sản phẩm liên quan (cùng danh mục, ngoại trừ sản phẩm hiện tại)
             $relatedProducts = Product::with('variants') // Lấy các biến thể chính và hình ảnh
