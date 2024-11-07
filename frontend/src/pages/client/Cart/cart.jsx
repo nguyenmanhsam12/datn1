@@ -3,10 +3,62 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+
 const Cart = () => {
-  const { cartItems, updateCartItemQuantity, removeCartItem, clearCart } = useCart();
-  const [message, setMessage] = useState('');
-  const [allSelected, setAllSelected] = useState(false); 
+  const { cartItems, updateCartItemQuantity, removeCartItem, clearCart, setCartItems } = useCart();
+  const [allSelected, setAllSelected] = useState(false);
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const navigate = useNavigate();
+
+  const handleToggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedItems(new Set()); 
+    } else {
+      const allItemIds = cartItems.map(item => item.product_variant_id);
+      setSelectedItems(new Set(allItemIds)); 
+    }
+    setAllSelected(prev => !prev);
+  };
+
+  const handleToggleSelectItem = (productVariantId) => {
+    const newSelectedItems = new Set(selectedItems);
+    if (newSelectedItems.has(productVariantId)) {
+      newSelectedItems.delete(productVariantId); 
+    } else {
+      newSelectedItems.add(productVariantId); 
+    }
+    setSelectedItems(newSelectedItems);
+  };
+
+  const totalPrice = Array.from(selectedItems).reduce((total, productVariantId) => {
+    const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
+    const itemTotal = (item?.price || 0) * (item?.quantity || 0);
+    return total + itemTotal;
+  }, 0);
+
+  const handleCheckout = () => {
+    if (selectedItems.size === 0) {
+      toast.warn("Please select at least one item to checkout.");
+    } else {
+      const itemsToCheckout = Array.from(selectedItems).map(productVariantId =>
+        cartItems.find(item => item.product_variant_id === productVariantId)
+      ).filter(Boolean);
+
+      navigate('/checkout', { state: { items: itemsToCheckout } });
+    }
+  };
+
+  const handleRemoveItem = async (productVariantId) => {
+    const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
+    if (item) {
+      const isConfirmed = window.confirm("Are you sure you want to remove this item?");
+      if (isConfirmed) {
+        await removeCartItem(item.id);
+        toast.success("Item removed successfully!");
+      }
+    }
+  };
 
   const increaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
@@ -17,39 +69,38 @@ const Cart = () => {
         console.error(`Item with productVariantId ${productVariantId} not found`);
     }
 };
-
-const decreaseQuantity = async (productVariantId) => {
+  const decreaseQuantity = async (productVariantId) => {
     const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
     if (item && item.quantity > 1) {
         const newQuantity = item.quantity - 1;
-        await updateCartItemQuantity(productVariantId, newQuantity, item); // Truyền item vào
+        await updateCartItemQuantity(productVariantId, newQuantity, item); 
     } else if (!item) {
         console.error(`Item with productVariantId ${productVariantId} not found`);
     }
-};
+  };
 
+  // xóa full cart
+  const handleClearAll = async () => {
+    const isConfirmed = window.confirm("Are you sure you want to clear all selected items?");
+    if (isConfirmed) {
+      // Remove selected items
+      const itemsToRemove = Array.from(selectedItems).map(productVariantId =>
+        cartItems.find(item => item.product_variant_id === productVariantId)
+      );
 
-  const handleRemoveItem = async (productVariantId) => {
-    const item = cartItems.find(cartItem => cartItem.product_variant_id === productVariantId);
-    if (item) {
-      const isConfirmed = window.confirm("Are you sure you want to remove this item?");
-      
-      if (isConfirmed) {
-        await removeCartItem(item.id); 
-        toast.success("Item removed successfully!");
-        
+      for (const item of itemsToRemove) {
+        if (item) {
+          await removeCartItem(item.id); 
+        }
       }
+
+      const updatedCartItems = cartItems.filter(item => !selectedItems.has(item.product_variant_id));
+    setCartItems(updatedCartItems); 
+      setSelectedItems(new Set()); 
+      toast.success("All selected items have been removed from the cart.");
     }
   };
 
-  const handleToggleSelectAll = () => {
-    setAllSelected(prev => !prev); 
-  };
-
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + ((item.price || 0) * (item.quantity || 0)),
-    0
-  ); 
   return (
     <div className="container my-5">
       <ToastContainer />
@@ -70,12 +121,6 @@ const decreaseQuantity = async (productVariantId) => {
 
           <h3 className="text-center mb-4">Shopping Cart</h3>
 
-          {message && (
-            <div className="alert alert-info" role="alert">
-              {message}
-            </div>
-          )}
-
           <div className="shoppingcart-content bg-light rounded shadow p-4">
             <form className="cart-form" onSubmit={(e) => e.preventDefault()}>
               <table className="table table-striped">
@@ -84,8 +129,8 @@ const decreaseQuantity = async (productVariantId) => {
                     <th scope="col" className="text-center">
                       <input
                         type="checkbox"
-                        checked={allSelected} 
-                        onChange={handleToggleSelectAll} 
+                        checked={allSelected}
+                        onChange={handleToggleSelectAll}
                       />
                     </th>
                     <th scope="col" className="text-center">Image</th>
@@ -102,19 +147,19 @@ const decreaseQuantity = async (productVariantId) => {
                         <td className="text-center">
                           <input
                             type="checkbox"
-                            checked={allSelected} 
-                            onChange={() => {}} 
+                            checked={selectedItems.has(item.product_variant_id)}
+                            onChange={() => handleToggleSelectItem(item.product_variant_id)}
                           />
                         </td>
                         <td className="text-center">
                           <img
-                            src={`http://127.0.0.1:8000${item.product.image}`} 
-                            // alt={item.product.name}
-                            style={{ width: '150px', height: '100px', objectFit: 'cover' }} 
+                            src={`http://127.0.0.1:8000${item.product.image}`}
+                            style={{ width: '150px', height: '100px', objectFit: 'cover' }}
                           />
                         </td>
                         <td className="text-center">
                           <strong>{item?.product?.name}</strong>
+                          <div className="text-muted">Size: {item?.size?.size}</div>
                         </td>
                         <td className="text-center">
                           {(item.price || 0).toLocaleString()} VND
@@ -129,7 +174,7 @@ const decreaseQuantity = async (productVariantId) => {
                             className="form-control text-center"
                             style={{ width: '70px', display: 'inline-block' }}
                           />
-                          <button type="button" onClick={() => increaseQuantity(item.product_variant_id)}>+</button>
+                           <button type="button" onClick={() => increaseQuantity(item.product_variant_id)}>+</button>
                         </td>
                         <td className="text-center">
                           <button
@@ -137,7 +182,7 @@ const decreaseQuantity = async (productVariantId) => {
                             className="btn btn-link text-danger"
                             onClick={() => handleRemoveItem(item.product_variant_id)}
                           >
-                            Remove
+                            <i class="bi bi-trash3"></i>
                           </button>
                         </td>
                       </tr>
@@ -155,17 +200,21 @@ const decreaseQuantity = async (productVariantId) => {
 
             <div className="d-flex justify-content-between align-items-center border-top pt-3">
               <span className="font-weight-bold">Total Price:</span>
-              <span className="h5 text-danger">{totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} VND</span>
-
+              <span className="h5 text-danger">
+                {selectedItems.size > 0 && totalPrice > 0
+                  ? totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                  : '0'
+                } VND
+              </span>
             </div>
 
             <div className="d-flex justify-content-between mt-4">
-              <button className="btn btn-danger" onClick={clearCart}>
-                Clear All
+              <button className="btn btn-danger" onClick={handleClearAll}>
+              <i class="bi bi-trash3"></i>
               </button>
-              <Link to="/checkout" className="btn btn-primary">
+              <button className="btn btn-primary" onClick={handleCheckout}>
                 Check Out
-              </Link>
+              </button>
             </div>
           </div>
         </div>

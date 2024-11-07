@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const baseURL = "http://127.0.0.1:8000";
 
@@ -41,8 +42,8 @@ const MainProducts = ({ products }) => {
                     </div>
                     <div className="product-info clearfix text-center">
                       <div className="fix">
-                        <h4 className="post-title">
-                          <a href={`product/${product.slug}`}>{product.name}</a>
+                        <h4 className="post-title floatleft">
+                        <Link to={`product/${product.slug}`}>{product.name}</Link>
                         </h4>
                       </div>
                       <div className="fix">

@@ -13,9 +13,11 @@ const BannerProducts = () => {
             <div className="breadcumbs pb-15">
               <ul>
                 <li>
-                  <a href="">Home</a>
+                  <a href="/">Home</a>
                 </li>
-                <li>Shop</li>
+                <li>
+                  <a href="/products">Shop</a>
+                </li>
               </ul>
             </div>
           </div>

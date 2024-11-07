@@ -1,8 +1,7 @@
 import React from 'react';
 
-const CartItem = ({ item}) => { 
+const CartItem = ({ item }) => { 
     const price = parseFloat(item.price) || 0;
-console.log('item', item)
     const baseURL = "http://127.0.0.1:8000"; 
 
     const cartItemStyle = {
@@ -13,7 +12,7 @@ console.log('item', item)
     };
 
     const cartItemImageStyle = {
-        width: '170px',
+        width: '150px',
         height: '100px',
         objectFit: 'cover',
         marginRight: '20px', 
@@ -22,8 +21,16 @@ console.log('item', item)
     const cartItemInfoStyle = {
         flex: 1,
         display: 'flex',
+        flexDirection: 'column', 
+        justifyContent: 'flex-start', 
+        alignItems: 'flex-start', 
+    };
+
+    const cartItemNamePriceStyle = {
+        display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'center', 
+        width: '100%', 
+        alignItems: 'center', // Align name and price vertically in the center
     };
 
     const cartItemNameStyle = {
@@ -40,6 +47,14 @@ console.log('item', item)
         marginLeft: '10px', 
     };
 
+    const cartItemSizeStyle = {
+        fontSize: '14px',
+        color: '#555',
+        marginTop: '5px',
+    };
+
+    const size = item?.size?.size;
+
     return (
         <tr>
             <td>
@@ -54,8 +69,13 @@ console.log('item', item)
                         <span>No image available</span>
                     )}
                     <div style={cartItemInfoStyle}>
-                        <h4 style={cartItemNameStyle}>{item.product ? item?.product?.name : "Product Name"}</h4>
-                        <span style={cartItemPriceStyle}>{price.toFixed(2)} VND</span>
+                        <div style={cartItemNamePriceStyle}>
+                            <h4 style={cartItemNameStyle}>{item.product ? item?.product?.name : "Product Name"}</h4>
+                            <span style={cartItemPriceStyle}>{price.toFixed(2)} VND</span>
+                        </div>
+                        {size && (
+                            <span style={cartItemSizeStyle}>Size: {size}</span>
+                        )}
                     </div> 
                 </div>
             </td>

@@ -11,42 +11,41 @@ const MainSingle = () => {
     const [variant, setVariant] = useState([]);
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [quantity, setQuantity] = useState(1); 
-
     const { addToCart } = useCart();
-
     const baseURL = "http://127.0.0.1:8000"; 
     const { slug } = useParams();
-
+    const [isAdding, setIsAdding] = useState(false);
+    
     useEffect(() => {
         const fetchDetail = async () => {
             try {
                 const resdata = await axios.get(`http://127.0.0.1:8000/api/getProductBySlug/${slug}`);
-                setDetail(resdata.data.data.product);
-                setGallary(resdata.data.data.product.gallary);
-                setVariant(resdata.data.data.product.variants);
-                
-                // Không tự động chọn variant hay thêm vào giỏ hàng
-                if (resdata.data.data.product.variants.length > 0) {
-                // setSelectedVariant(resdata.data.data.product.variants[0]);
-
-                    // Bạn có thể đặt selectedVariant là null hoặc một giá trị khác không phải là biến thể.
-                    setSelectedVariant(null); // Đặt nó là null để không có gì được chọn
-                    setQuantity(1); // Đặt số lượng mặc định là 1
-                }
+                const product = resdata.data.data.product;
+                setDetail(product);
+                setGallary(product.gallary);
+                setVariant(product.variants);
+                setSelectedVariant(null);
+                setQuantity(1);
             } catch (error) {
                 console.log("Error fetching product details:", error);
             }
         };
         fetchDetail();
     }, [slug]);
-    
+
     const handleSizeClick = (variant) => {
         console.log("Variant clicked:", variant);
         setSelectedVariant(variant);
         setQuantity(1); 
     };
-    
-    const [isAdding, setIsAdding] = useState(false); 
+
+    const incrementQuantity = () => {
+        setQuantity((prev) => prev + 1);
+    };
+
+    const decrementQuantity = () => {
+        setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+    };
 
     const handleAddToCart = async () => {
         if (isAdding) return; 
@@ -64,7 +63,16 @@ const MainSingle = () => {
             setIsAdding(false); 
             return;
         }
-    
+        if (!selectedVariant || selectedVariant.stock === 0) {
+            toast.error("Sorry, this product is out of stock.");
+            setIsAdding(false);
+            return;
+        }
+        if (selectedVariant.stock < quantity) {
+            toast.error("Sorry, not enough stock to add this product to the cart.");
+            setIsAdding(false);
+            return;
+        }
         if (quantity <= 0) {
             toast.warning("Quantity must be greater than 0.");
             setIsAdding(false); 
@@ -79,18 +87,18 @@ const MainSingle = () => {
             toast.success("Product added to cart successfully!");
             setQuantity(1); 
         } catch (error) {
-            console.error('Caught error:', error); // In chi tiết lỗi
+            console.error('Caught error:', error); 
             if (error.response) {
-                console.error('Server responded with:', error.response.data); // Xem phản hồi từ server
+                console.error('Server responded with:', error.response.data); 
             } else {
-                console.error('Error message:', error.message); // Xem thông báo lỗi
+                console.error('Error message:', error.message); 
             }
             toast.error("Failed to add product to cart.");
-        }finally {
+        } finally {
             setIsAdding(false); 
         }
     };
-    
+
     return (
         <div className="product-area single-pro-area pt-80 pb-80 product-style-2">
             <div className="container">
@@ -121,7 +129,7 @@ const MainSingle = () => {
                                 </div>
                                 <div className="fix mb-20">
                                     <span className="pro-price">
-                                    ${selectedVariant ? selectedVariant.price : details.price}
+                                    ${selectedVariant ? selectedVariant.price :  `${details.minPrice} - ${details.maxPrice}`}
                                     </span>
                                 </div>
                                 <div className="product-description">
@@ -144,20 +152,32 @@ const MainSingle = () => {
                                         ))}
                                     </ul>
                                 </div>
-
+                                <div className="stock-info mb-20">
+                                    {selectedVariant ? (
+                                        selectedVariant.stock > 0 ? (
+                                            <span className="in-stock">In Stock: {selectedVariant.stock}</span>
+                                        ) : (
+                                            <span className="out-of-stock">Out of Stock</span>
+                                        )
+                                    ) : (
+                                        <span className="select-variant">Please select a size</span>
+                                    )}
+                                </div>
                                 <div className="clearfix">
                                     <div className="cart-plus-minus">
+                                        <button onClick={decrementQuantity} className="dec qtybutton">-</button>
                                         <input
-                                            type="number"
+                                            // type="number"
                                             name="qtybutton"
                                             value={quantity}
                                             min="1"
                                             onChange={(e) => {
-                                                const value = Math.max(1, parseInt(e.target.value) || 1); // Chuyển đổi chuỗi thành số
+                                                const value = Math.max(1, parseInt(e.target.value) || 1); 
                                                 setQuantity(value);
                                             }}
                                             className="cart-plus-minus-box"
                                         />
+                                        <button onClick={incrementQuantity} className="inc qtybutton">+</button>
                                     </div>
                                     <div className="product-action clearfix">
                                         <a href="#" title="Wishlist"><i className="zmdi zmdi-favorite-outline" /></a>
@@ -165,7 +185,7 @@ const MainSingle = () => {
                                         <a href="#" title="Compare"><i className="zmdi zmdi-refresh" /></a>
                                         <a href="#" title="Add To Cart" onClick={(e) => {
                                                 e.preventDefault(); 
-                                                handleAddToCart();//day o oi
+                                                handleAddToCart();
                                             }}>
                                             <i className="zmdi zmdi-shopping-cart-plus" />
                                         </a>

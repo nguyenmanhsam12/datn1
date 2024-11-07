@@ -36,7 +36,7 @@ const Header = () => {
                         <a href="#">Yêu Thích</a>
                       </li>
                       <li>
-                        <a href="#">Giỏ Hàng</a>
+                        <a href="/cart">Giỏ Hàng</a>
                       </li>
                       <li>
                         <a href="#">Thanh Toán</a>
@@ -45,7 +45,7 @@ const Header = () => {
                         <a href="#">Đơn Hàng</a>
                       </li>
                       <li>
-                        <a href="#">Đăng Nhập</a>
+                        <a href="/auth/login">Đăng Nhập</a>
                       </li>
                     </ul>
                   </li>
@@ -87,7 +87,7 @@ const Header = () => {
             {/* logo start */}
             <div className="col-md col-6">
               <div className="top-logo">
-                <a href="">
+                <a href="/">
                   <img src="/client_css/img/logo/logo.webp" alt />
                 </a>
               </div>
@@ -100,13 +100,13 @@ const Header = () => {
                 <nav>
                   <ul>
                     <li className="expand">
-                      <a href="">Trang Chủ</a>
+                      <a href="/">Trang Chủ</a>
                     </li>
                     <li className="expand">
                       <a href="">Giới Thiệu</a>
                     </li>
                     <li className="expand position-static">
-                      <a href="">Cửa Hàng</a>
+                      <a href="/products">Cửa Hàng</a>
                       <div className="restrain mega-menu megamenu2">
                         <span>
                           <a className="mega-menu-title" href="">
@@ -156,7 +156,7 @@ const Header = () => {
                       </div>
                     </li>
                     <li className="expand">
-                      <a href="">Tin Tức</a>
+                      <a href="/news">Tin Tức</a>
                     </li>
                     <li className="expand">
                       <a href="">Liên Hệ</a>
@@ -169,7 +169,7 @@ const Header = () => {
               <div className="mini-cart text-right">
       <ul>
         <li>
-          <a className="cart-icon" href="#">
+          <a className="cart-icon" href="/cart">
             <i className="zmdi zmdi-shopping-cart" />
             <span>{cartItems.length}</span> 
           </a>
