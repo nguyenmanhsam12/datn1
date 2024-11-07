@@ -83,15 +83,13 @@ class Cart extends Model
             $checkAll = is_array($cartItemIdsToDelete) && in_array("all", $cartItemIdsToDelete);
 
             if (!empty($cartItemIdsToDelete)) {
-            
                 if ($checkAll) {
                     $cartIds = Cart::where('user_id', $userId)->pluck('id');
-                
                     CartItem::whereIn('cart_id', $cartIds)->delete();
-                    Cart::where('user_id', $userId)->delete();
-                    
+                    Cart::query()->where('user_id', $userId)->delete();
                     return true;
                 }
+                
 
                 CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
             }
@@ -107,90 +105,97 @@ class Cart extends Model
         }
     }
 
-    // public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)
-    // {
-    //     $updatedCartItems = collect();
+    public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)
+    {
+        $updatedCartItems = collect();
 
-    //     if (!empty($cartItemIdsToDelete)) {
-    //         CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
-    //     }
+        if (!empty($cartItemIdsToDelete)) {
+            CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
+        }
 
-    //     if (!empty($cartItemsData)) {
-    //         $cart = Cart::firstOrCreate(['user_id' => $userId]);
+        if (!empty($cartItemsData)) {
+            $cart = Cart::firstOrCreate(['user_id' => $userId]);
 
-    //         foreach ($cartItemsData as $itemData) {
+            foreach ($cartItemsData as $itemData) {
+        
+                if ($itemData['quantity'] > 0) {
+                    $cartItem = CartItem::where('id', $itemData['cart_item_id'])->first();
+                    $productVariant=ProductVariant::find($cartItem->product_variant_id);
+                    $value = $cartItem?->quantity + $itemData['quantity'];
 
-    //             if ($itemData['quantity'] > 0) {
-    //                 $cartItem = CartItem::where('id', $itemData['cart_item_id'])->first();
+                    if ($cartItem) {
+                     
+                        if($value> $productVariant->stock){
+                           throw new \Exception("Không đủ tồn kho thêm cái cứt ý!.");
+                        }
+                        $cartItem->quantity = $itemData['quantity'];
 
-    //                 if ($cartItem) {
-    //                     $cartItem->quantity = $itemData['quantity'];
-    //                     $cartItem->save();
-    //                 } else {
-    //                     $cartItem = CartItem::create([
-    //                         'cart_id' => $cart->id,
-    //                         'product_variant_id' => $itemData['product_variant_id'],
-    //                         'quantity' => $itemData['quantity'],
-    //                     ]);
-    //                 }
-    //                 $updatedCartItems->push($cartItem);
-    //             } else {
-    //                 CartItem::where('id', $itemData['cart_item_id'])->delete();
-    //             }
-    //         }
-    //     }
+                        $cartItem->save();
+                    } else {
+                        $cartItem = CartItem::create([
+                            'cart_id' => $cart->id,
+                            'product_variant_id' => $itemData['product_variant_id'],
+                            'quantity' => $itemData['quantity'],
+                        ]);
+                    }
+                    $updatedCartItems->push($cartItem);
+                } else {
+                    CartItem::where('id', $itemData['cart_item_id'])->delete();
+                }
+            }
+        }
 
-    //     return $updatedCartItems;
-    // }
+        return $updatedCartItems;
+    }
 
 
 
     
-    public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)
-{
-    \Log::info('Received cart items data:', $cartItemsData);
+//     public static function updateCart($userId, $cartItemsData, $cartItemIdsToDelete)
+// {
+//     \Log::info('Received cart items data:', $cartItemsData);
 
-    $updatedCartItems = collect();
+//     $updatedCartItems = collect();
 
-    if (!empty($cartItemIdsToDelete)) {
-        CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
-    }
+//     if (!empty($cartItemIdsToDelete)) {
+//         CartItem::whereIn('id', $cartItemIdsToDelete)->delete();
+//     }
 
-    if (!empty($cartItemsData)) {
-        $cart = Cart::firstOrCreate(['user_id' => $userId]);
+//     if (!empty($cartItemsData)) {
+//         $cart = Cart::firstOrCreate(['user_id' => $userId]);
 
-        foreach ($cartItemsData as $itemData) {
-            // Log each item data to check its structure
-            \Log::info('Processing cart item:', $itemData);
+//         foreach ($cartItemsData as $itemData) {
+//             // Log each item data to check its structure
+//             \Log::info('Processing cart item:', $itemData);
 
-            // Check if 'cart_item_id' exists in the item
-            if (!isset($itemData['cart_item_id'])) {
-                \Log::error('cart_item_id is missing in item data:', $itemData);
-                continue; // Skip this item if the ID is missing
-            }
+//             // Check if 'cart_item_id' exists in the item
+//             if (!isset($itemData['cart_item_id'])) {
+//                 \Log::error('cart_item_id is missing in item data:', $itemData);
+//                 continue; // Skip this item if the ID is missing
+//             }
 
-            if ($itemData['quantity'] > 0) {
-                $cartItem = CartItem::where('id', $itemData['cart_item_id'])->first();
+//             if ($itemData['quantity'] > 0) {
+//                 $cartItem = CartItem::where('id', $itemData['cart_item_id'])->first();
 
-                if ($cartItem) {
-                    $cartItem->quantity = $itemData['quantity'];
-                    $cartItem->save();
-                } else {
-                    $cartItem = CartItem::create([
-                        'cart_id' => $cart->id,
-                        'product_variant_id' => $itemData['product_variant_id'],
-                        'quantity' => $itemData['quantity'],
-                    ]);
-                }
-                $updatedCartItems->push($cartItem);
-            } else {
-                CartItem::where('id', $itemData['cart_item_id'])->delete();
-            }
-        }
-    }
+//                 if ($cartItem) {
+//                     $cartItem->quantity = $itemData['quantity'];
+//                     $cartItem->save();
+//                 } else {
+//                     $cartItem = CartItem::create([
+//                         'cart_id' => $cart->id,
+//                         'product_variant_id' => $itemData['product_variant_id'],
+//                         'quantity' => $itemData['quantity'],
+//                     ]);
+//                 }
+//                 $updatedCartItems->push($cartItem);
+//             } else {
+//                 CartItem::where('id', $itemData['cart_item_id'])->delete();
+//             }
+//         }
+//     }
 
-    return $updatedCartItems;
-}
+//     return $updatedCartItems;
+// }
  
 
 }

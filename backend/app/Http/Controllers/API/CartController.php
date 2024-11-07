@@ -87,17 +87,35 @@ class CartController extends Controller
 
     public function updateCart(Request $request)
     {
-        $user = auth()->user();
-        $cartItemsData = $request->input('cart_items');
-        $cartItemIdsToDelete = $request->input('cart_item_ids_to_delete', []);
-        $updatedItems = $this->cart->updateCart($user->id, $cartItemsData, $cartItemIdsToDelete);
-
-        return response()->json([
-            'message' => 'Giỏ hàng đã được cập nhật!',
-            'updated_items' => $updatedItems,
-        ], 200);
+        try {
+            // Get the authenticated user
+            $user = auth()->user();
+            
+            // Get the cart items data from the request
+            $cartItemsData = $request->input('cart_items');
+            
+            // Get the IDs of items to delete from the request
+            $cartItemIdsToDelete = $request->input('cart_item_ids_to_delete', []);
+            
+            // Call the cart service to update the cart
+            $updatedItems = $this->cart->updateCart($user->id, $cartItemsData, $cartItemIdsToDelete);
+        
+            // Return a successful response
+            return response()->json([
+                'message' => 'Giỏ hàng đã được cập nhật!',
+                'updated_items' => $updatedItems,
+            ], 200);
+    
+        } catch (\Exception $e) {
+            // If an exception occurs, return an error response with the message
+            return response()->json([
+                'message' => 'Có lỗi xảy ra khi cập nhật giỏ hàng!',
+                'result' => false,
+                'error' => $e->getMessage(),  // Optionally, log this message for debugging
+            ], 500); // 500 is a generic server error code
+        }
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */
