@@ -83,8 +83,13 @@ class Cart extends Model
             $checkAll = is_array($cartItemIdsToDelete) && in_array("all", $cartItemIdsToDelete);
 
             if (!empty($cartItemIdsToDelete)) {
+            
                 if ($checkAll) {
-                    Cart::query()->where('user_id', $userId)->delete();
+                    $cartIds = Cart::where('user_id', $userId)->pluck('id');
+                
+                    CartItem::whereIn('cart_id', $cartIds)->delete();
+                    Cart::where('user_id', $userId)->delete();
+                    
                     return true;
                 }
 
