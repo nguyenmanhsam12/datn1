@@ -4,7 +4,7 @@ import { useCart } from '../../../context/CartContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-
+import CartService from '../../../services/CartService';
 const Cart = () => {
   const { cartItems, updateCartItemQuantity, removeCartItem, clearCart, setCartItems } = useCart();
   const [allSelected, setAllSelected] = useState(false);
@@ -81,25 +81,31 @@ const Cart = () => {
 
   // xóa full cart
   const handleClearAll = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to clear all selected items?");
+    const isConfirmed = window.confirm("Are you sure you want to delete the selected items?");
     if (isConfirmed) {
-      // Remove selected items
-      const itemsToRemove = Array.from(selectedItems).map(productVariantId =>
-        cartItems.find(item => item.product_variant_id === productVariantId)
-      );
-
-      for (const item of itemsToRemove) {
-        if (item) {
-          await removeCartItem(item.id); 
+        const cartItemIdsToDelete = Array.from(selectedItems).map(productVariantId =>
+            cartItems.find(item => item.product_variant_id === productVariantId)?.id
+        ).filter(id => id !== undefined); 
+        
+        if (cartItemIdsToDelete.length === 0) {
+            toast.error("No items selected for deletion.");
+            return;
         }
-      }
 
-      const updatedCartItems = cartItems.filter(item => !selectedItems.has(item.product_variant_id));
-    setCartItems(updatedCartItems); 
-      setSelectedItems(new Set()); 
-      toast.success("All selected items have been removed from the cart.");
+        try {
+            await CartService.deleteCartItems(cartItemIdsToDelete); 
+            
+            const updatedCartItems = cartItems.filter(item => !selectedItems.has(item.product_variant_id));
+            setCartItems(updatedCartItems); 
+            setSelectedItems(new Set());
+            toast.success("Selected items have been removed from the cart.");
+        } catch (error) {
+            console.error("Failed to delete selected items:", error);
+            toast.error("Failed to delete selected items.");
+        }
     }
-  };
+};
+
 
   return (
     <div className="container my-5">

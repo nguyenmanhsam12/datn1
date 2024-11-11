@@ -77,22 +77,18 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateCartItemQuantity = async (productVariantId, newQuantity, existingItem) => {
-        if (!existingItem) {
-            console.error('Existing item is undefined');
-            return;
-        }
-
         const token = sessionStorage.getItem('token');
         if (!token) {
             console.error('User is not authenticated');
             return;
         }
-
+    
         if (newQuantity < 1) {
             console.error('Quantity must be at least 1.');
             return;
         }
-
+    
+    
         const payload = {
             cart_items: [{
                 cart_item_id: existingItem.id,
@@ -100,7 +96,7 @@ export const CartProvider = ({ children }) => {
                 product_variant_id: productVariantId,
             }],
         };
-
+    
         try {
             const response = await api.put('/cart/update-cart', payload, {
                 headers: {
@@ -108,8 +104,7 @@ export const CartProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                 },
             });
-           
-
+    
             if (response.data.updated_items && response.data.updated_items.length > 0) {
                 const updatedItems = response.data.updated_items;
                 setCartItems(prevItems =>
@@ -118,21 +113,28 @@ export const CartProvider = ({ children }) => {
                         return updatedItem ? { ...item, quantity: updatedItem.quantity } : item;
                     })
                 );
+    
+                toast.success('Giỏ hàng đã được cập nhật thành công!');
             } else {
                 console.error('Failed to update cart item quantity: No updated items found in response.');
             }
         } catch (error) {
-            console.error('Error updating cart item quantity:', error.response ? error.response.data : error.message);
+            const errorMessage = error.response?.data?.error || 'An unexpected error occurred.';
+            console.error('Error updating cart item quantity:', errorMessage);
+            toast.error(errorMessage); 
         }
     };
+    
+    
+    
 
     const removeCartItem = async (id) => {
         try {
             const updatedCartItems = cartItems.filter(item => item.id !== id);
-            const cart_item_ids_to_delete = [id];
-            await CartService.updateCart(updatedCartItems, cart_item_ids_to_delete);
+            const cartItemIdsToDelete  = [id];
+            await CartService.deleteCartItems(cartItemIdsToDelete);
             setCartItems(updatedCartItems);
-            toast.success(`Item with ID: ${id} has been removed from the cart.`);
+            // toast.success(`Item with ID: ${id} has been removed from the cart.`);
         } catch (error) {
             console.error('Failed to remove item:', error);
             toast.error('Failed to remove item from the cart.');

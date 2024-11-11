@@ -37,13 +37,6 @@ const CartService = {
                 },
             });
             console.log('response',response)
-            // if (response.data.status === 'success') { // co can bo cai status kh oo nhi
-            //     console.log('Cart updated successfully:', response.data);
-            //     return response.data;
-            // } else {
-            //     console.error('Failed to update cart:', response.data);
-            //     throw new Error('Failed to update cart');
-            // }
         } catch (error) {
             console.error('Error updating cart:', error);
             throw error;
@@ -61,6 +54,7 @@ const CartService = {
             const response = await api.post('/cart/delete-cart', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
             });
             console.log('Deleted cart items response:', response.data); // Log the response
